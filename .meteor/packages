@@ -22,3 +22,4 @@ twbs:bootstrap
 accounts-ui
 accounts-password
 http
+iron:router

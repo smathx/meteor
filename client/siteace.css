@@ -3,19 +3,23 @@
 	display:none;
 }
 
-.login-link-te xt {
+.login-link-text {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 18px;
     padding: 15px 15px;
     line-height: 20px;
     float: left;
     background-color: transparent;
+}    
+    
+.accounts-dialog a {
+
     text-decoration: none;
-/*    
+/*      
     color: #337ab7;
     cursor: auto;
     color: #777;
     height: 50px;
     margin-left: -15px;
-    */
+  */  
 }

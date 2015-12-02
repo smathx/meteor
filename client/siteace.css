@@ -1,0 +1,21 @@
+/* CSS declarations go here */
+.hidden_div{
+	display:none;
+}
+
+.login-link-te xt {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    padding: 15px 15px;
+    line-height: 20px;
+    float: left;
+    background-color: transparent;
+    text-decoration: none;
+/*    
+    color: #337ab7;
+    cursor: auto;
+    color: #777;
+    height: 50px;
+    margin-left: -15px;
+    */
+}

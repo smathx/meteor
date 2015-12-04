@@ -45,7 +45,8 @@ Template.website_form.events({
 			title: event.target.title.value,
 			url: event.target.url.value,
 			description: event.target.description.value,
-			createdOn: new Date()
+			ownerId: Meteor.userId(),
+			createdAt: new Date()
 		});
 		$('#website_form').toggle('slow');
 		return false;
@@ -54,20 +55,30 @@ Template.website_form.events({
 
 Template.commentForm.events({
 	'submit #comment-form':function (event) {
+	  console.log(this);
+    if (Meteor.user()) {
+  		Comments.insert({
+  			comment: event.target.comment.value,
+  			siteId: this._id,
+  			ownerId: Meteor.userId(),
+  			createdAt: new Date()
+  		});
 
-		Comments.insert({
-			comment: event.target.comment.value,
-			createdOn: new Date()
-		});
-    console.log('Add comment:' + event.target.comment.value);
+      console.log('Add comment:' + event.target.comment.value);
+    }
 		return false;
 	}
+});
+
+Template.registerHelper('getUsername', function (userId) {
+  var user = Meteor.users.findOne({ _id: userId });
+  return user ? user.username : "anonymous";
 });
 
 // accounts config
 
 Accounts.ui.config({
-	passwordSignupFields: 'USERNAME_AND_EMAIL'
+  passwordSignupFields: 'USERNAME_AND_EMAIL'
 });
 
 //end

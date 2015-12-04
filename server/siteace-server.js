@@ -5,50 +5,63 @@
 // Seed DB if empty
 Meteor.startup(function () {
 
-    if (!Websites.findOne()) {
-    	console.log("No websites yet. Creating starter data.");
+  // Dummy users
 
-    	Websites.insert({
-    		title:"Goldsmiths Computing Department",
-    		url:"http://www.gold.ac.uk/computing/",
-    		description:"This is where this course was developed.",
-    		createdOn:new Date()
-    	});
+  if (!Meteor.users.findOne()) {
+    console.log('Creating dummy user accounts.');
 
-    	Websites.insert({
-    		title:"University of London",
-    		url:"http://www.londoninternational.ac.uk/courses/undergraduate/goldsmiths/bsc-creative-computing-bsc-diploma-work-entry-route",
-    		description:"University of London International Programme.",
-    		createdOn:new Date()
-    	});
+    var names = ['Amy', 'Ben', 'Eva', 'Joe', 'Max', 'Mia', 'Sam', 'Zoe'];
 
-    	Websites.insert({
-    		title:"Coursera",
-    		url:"http://www.coursera.org",
-    		description:"Universal access to the world’s best education.",
-    		createdOn:new Date()
-    	});
+    names.forEach(function (name) {
+      Accounts.createUser({
+        username: name,
+        email: name.toLowerCase() + '@fake.mail',
+        password: '......'
+      });
+    });
+  }
 
-    	Websites.insert({
-    		title:"Google",
-    		url:"http://www.google.com",
-    		description:"Popular search engine.",
-    		createdOn:new Date()
-    	});
-    }
+  if (!Websites.findOne()) {
+    console.log("Creating dummy website data.");
 
-    if (!Comments.findOne()) {
-        Comments.insert({
-            comment: "Test comment",
-            createdOn: new Date()
-        });
-    }
+    var sites = ['Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda',
+      'Amazon', 'Ford', 'BP', 'Chevron', 'Walmart', 'Verizon'
+    ];
 
-    if (!Meteor.users.findOne()) {
-        Accounts.createUser({
-            username: "Jon",
-            email: "jon@gmail.com",
-            password: "123456"
-        });
-    }
+    sites.forEach(function (name) {
+      Websites.insert({
+        title: name,
+        url: 'http://www.' + name.toLowerCase() + '.com',
+        description: 'This is the website for ' + name,
+        ownerId: _.sample(Meteor.users.find({}, { _id: true }).fetch())._id,
+        createdAt: new Date()
+      });
+    });
+  }
+
+  // Dummy comments
+
+  if (!Comments.findOne()) {
+    Comments.insert({
+      comment: "Test comment",
+      createdOn: new Date()
+    });
+  }
+
+  // Dummy users
+
+  if (!Meteor.users.findOne()) {
+    Accounts.createUser({
+        username: "Jon",
+        email: "jon@gmail.com",
+        password: "123456"
+      }),
+      Accounts.createUser({
+        username: "Jon",
+        email: "jon@gmail.com",
+        password: "123456"
+      });
+  }
 });
+
+//end

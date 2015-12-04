@@ -82,7 +82,7 @@
   </a>
   <!-- you will be putting your up and down vote buttons in here! -->
   <a href="sites/{{_id}}">More details</a>
-  <p>Up votes: {{up_votes}}, Down votes: {{down_votes}}, Added: {{createdOn}}</p>
+  <p>Up votes: {{up_votes}}, Down votes: {{down_votes}}, Added: {{createdAt}}</p>
 </li>
 </template>
 
@@ -91,10 +91,18 @@
 <template name="site-details">
   <div class="container">
     <a href="{{url}}">{{title}}</a>
+    <p></p>
     <p>
       {{description}}
     </p>
-    <p>Up votes: {{up_votes}}, Down votes: {{down_votes}}, Added: {{createdOn}}</p>
+    <p>
+      <span class="glyphicon glyphicon-thumbs-up"></span> {{up_votes}} Recommend
+      &nbsp;·&nbsp;
+      <span class="glyphicon glyphicon-thumbs-down"></span> {{down_votes}} Avoid
+    </p>
+    <p>
+      First recommended by <span class="username">{{ getUsername(ownerId) }}</span> on {{createdAt}}
+    </p>
     {{> commentForm }}
   </div>
 </template>

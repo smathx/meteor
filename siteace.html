@@ -1,6 +1,12 @@
 <head>
   <title>Site Ace</title>
-</head>
+  <!-- link rel="icon" sizes="16x16 32x32 48x48" href="/favicon.ico?" -->
+
+<!-- Touch Icons - iOS and Android 2.1+ 180x180 pixels in size. -->
+<link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png">
+
+<!-- Firefox, Chrome, Safari, IE 11+ and Opera. 196x196 pixels in size. -->
+<link rel="icon" href="/favicon-194x194.png"></head>
 
 <body>
 </body>
@@ -82,7 +88,11 @@
   </a>
   <!-- you will be putting your up and down vote buttons in here! -->
   <a href="sites/{{_id}}">More details</a>
-  <p>Up votes: {{up_votes}}, Down votes: {{down_votes}}, Added: {{createdAt}}</p>
+  <p>
+    Up votes: {{upVotes}}, Down votes: {{downVotes}},
+    Added by <span class="username">{{ getUsername(ownerId) }}</span> on
+    {{formatDate(createdAt)}}
+  </p>
 </li>
 </template>
 
@@ -96,12 +106,13 @@
       {{description}}
     </p>
     <p>
-      <span class="glyphicon glyphicon-thumbs-up"></span> {{up_votes}} Recommend
+      <span class="glyphicon glyphicon-thumbs-up"></span> {{upVotes}} Recommend
       &nbsp;·&nbsp;
-      <span class="glyphicon glyphicon-thumbs-down"></span> {{down_votes}} Avoid
+      <span class="glyphicon glyphicon-thumbs-down"></span> {{downVotes}} Avoid
     </p>
     <p>
-      First recommended by <span class="username">{{ getUsername(ownerId) }}</span> on {{createdAt}}
+      First recommended by <span class="username">{{ getUsername(ownerId) }}</span> on
+      {{formatDate(createdAt)}}
     </p>
     {{> commentForm }}
   </div>

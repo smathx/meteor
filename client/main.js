@@ -7,7 +7,7 @@
 // helper function that returns all available websites
 Template.website_list.helpers({
 	websites:function () {
-		return Websites.find({}, { sort: { up_votes: -1, down_votes: 1 }});
+		return Websites.find({}, { sort: { upVotes: -1, downVotes: 1 }});
 	}
 });
 
@@ -19,7 +19,7 @@ Template.website_item.events({
 		var website_id = this._id;
 		console.log('Up voting website with id '+website_id);
 
-		Websites.update({_id:website_id}, { $inc: { up_votes: 1}});
+		Websites.update({_id:website_id}, { $inc: { upVotes: 1}});
 		return false;
 	},
 
@@ -27,7 +27,7 @@ Template.website_item.events({
 		var website_id = this._id;
 		console.log('Down voting website with id '+website_id);
 
-		Websites.update({_id:website_id}, { $inc: { down_votes: 1}});
+		Websites.update({_id:website_id}, { $inc: { downVotes: 1}});
 		return false;
 	}
 });
@@ -73,6 +73,27 @@ Template.commentForm.events({
 Template.registerHelper('getUsername', function (userId) {
   var user = Meteor.users.findOne({ _id: userId });
   return user ? user.username : "anonymous";
+});
+
+// formatDate should convert a Date object to a reasonable date string - numeric
+// day, month string, and 4 digit year. The order, language and separators
+// depend on the user locale. For example, the fifth day of the twelfth month
+// in 2015 in the locale 'en-GB' returns '5 December 2015'.
+
+Template.registerHelper('formatDate', function (datetime) {
+  // ???? get user locale - iffy
+  var locale = navigator.language ||        // Chrome, Firefox, IE >= 11
+               navigator.userLanguage ||    // IE <= 10
+               navigator.browserLanguage;   // IE <= 10
+
+  console.log(locale);
+
+  if (locale) {
+    var options = { day: "numeric", month: "long", year: "numeric" };
+    return datetime.toLocaleDateString(locale, options);
+  } else {
+    return datetime.toLocaleDateString();
+  }
 });
 
 // accounts config

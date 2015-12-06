@@ -115,6 +115,7 @@
       {{formatDate(createdAt)}}
     </p>
     {{> commentForm }}
+    {{> commentList }}
   </div>
 </template>
 
@@ -132,5 +133,18 @@
         <button type="submit" class="btn btn-default">Save</button>
       </form>
     </div>
+  </div>
+</template>
+
+<!-- Display all comments for a particular site --------------------------- -->
+
+<template name="commentList">
+  <div class="container">
+    <ul>
+      {{ commentCount _id }} comments
+      {{#each comments _id }}
+        <li>{{ comment }}</li>
+      {{/each}}
+    </ul>
   </div>
 </template>

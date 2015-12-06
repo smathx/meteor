@@ -111,7 +111,7 @@ Meteor.startup(function () {
     Websites.find().forEach(function (site) {
       for (var n = 1; n <= randomNumber(0, 10); n++) {
         Comments.insert({
-          comment: "Test comment",
+          comment: 'Comment ' + randomNumber(1000000) + ' for ' + site.url,
           siteId: site._id,
           ownerId: randomUserId(),
           createdAt: randomDate(site.createdAt)

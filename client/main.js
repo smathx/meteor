@@ -70,6 +70,15 @@ Template.commentForm.events({
 	}
 });
 
+Template.commentList.helpers({
+	comments: function (siteId) {
+		return Comments.find({ siteId: siteId});
+	},
+	commentCount: function (siteId) {
+		return Comments.find({ siteId: siteId }).count();
+	}
+});
+
 Template.registerHelper('getUsername', function (userId) {
   var user = Meteor.users.findOne({ _id: userId });
   return user ? user.username : "anonymous";

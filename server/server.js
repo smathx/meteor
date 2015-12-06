@@ -4,8 +4,10 @@
 
 Meteor.startup(function () {
 
+  var randomSeed;
+  seedRandomNumber();
+
   var cleanDB = true;
-  var randomSeed = 1;
   var earliestDate = '12/12/12';
 
   // Clean out DB for testing - quicker than reset.
@@ -18,22 +20,39 @@ Meteor.startup(function () {
 
   // Some helper functions for random data.
 
-  var randomNumber;
+  // randomNumber() returns a random integer >= min and < max. If max is
+  // undefined, the range defaults to 0 to min. Seeded by randomSeed.
+  // Note: The LCG is a relatively short period to avoid loss of precision
+  // when integers are greater than MAX_SAFE_INTEGER, 2^53-1 or 16 digits.
 
-  if (randomSeed) {
-    randomNumber = function (min, max) {
-      randomSeed = (1103515245 * randomSeed + 12345) & 0x7fffffff;
-      return Math.floor(min + (randomSeed / 0x7fffffff) * (max - min));
-    };
-  } else {
-    randomNumber = function (min, max) {
-      return Math.floor(min + Math.random() * (max - min));
-    };
+  function randomNumber(min, max) {
+      if (typeof(max) === 'undefined') {
+        max = min;
+        min = 0;
+      }
+
+      var a = 9301;
+      var c = 49297;
+      var m = 233280;
+
+      randomSeed = ((a * randomSeed) + c) % m;
+      return Math.floor(min + (randomSeed / m) * (max - min));
+  }
+
+  // Set the random seed to a specific value or random 6 digit value if undefined.
+
+  function seedRandomNumber(seed) {
+    if (typeof(seed) === 'undefined')
+      randomSeed = Math.floor(Math.random() * 1000000);
+    else
+      randomSeed = seed;
+
+    console.log('Random seed set to ' + randomSeed);
   }
 
   function randomUserId() {
     var userIds = Meteor.users.find({}, { _id: true }).fetch();
-    return userIds[randomNumber(0, userIds.length)]._id;
+    return userIds[randomNumber(userIds.length)]._id;
   }
 
   // start is either a Date object or a String recognised by the Date() constructor.
@@ -41,7 +60,7 @@ Meteor.startup(function () {
     var startDate = start || earliestDate;
 
     if (typeof(startDate) === 'string')
-      startDate = new Date(start);
+      startDate = new Date(startDate);
 
     return new Date(randomNumber(startDate.getTime(), Date.now()));
   }
@@ -76,8 +95,8 @@ Meteor.startup(function () {
         title: name,
         url: 'http://www.' + name.toLowerCase() + '.com',
         description: 'This is the website for ' + name,
-        upVotes: randomNumber(0, 10),
-        downVotes: randomNumber(0, 5),
+        upVotes: randomNumber(10),
+        downVotes: randomNumber(5),
         ownerId: randomUserId(),
         createdAt: randomDate()
       });

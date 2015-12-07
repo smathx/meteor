@@ -12,6 +12,7 @@
 </body>
 
 <template name="ApplicationLayout">
+  {{> commentModal }}
   {{> yield "navbar"}}
   {{> yield "add-site-form"}}
   {{> yield "main"}}
@@ -100,11 +101,8 @@
 
 <template name="siteDetailsPage">
   <div class="container">
-    <a href="{{url}}">{{title}}</a>
-    <p></p>
-    <p>
-      {{description}}
-    </p>
+    <a href="{{url}}"><h2>{{title}}</h2></a>
+    <p>{{description}}</p>
     <p>
       <span class="glyphicon glyphicon-thumbs-up"></span> {{upVotes}} Recommend
       &nbsp;·&nbsp;
@@ -123,20 +121,53 @@
 <template name="commentSection">
   <h3>Comments</h3>
   {{#if currentUser }}
-    <p>{{ commentCountMsg _id }}</p>
-    {{> commentForm }}
+    <div class="row">
+      <div class="col-xs-9">
+        <p>{{ commentCountMsg _id }}</p>
+      </div>
+      <div class="col-xs-3">
+        <button type="button" class="btn btn-primary btn-sm pull-right"
+                data-toggle="modal" data-target="#addCommentModal">
+          Add new comment&hellip;
+        </button>
+      </div>
+    </div>
+    <br>
   {{else}}
-    <p>{{ commentCountMsg _id }} Sign in to add one.</p>
+    <p>{{ commentCountMsg _id }} Sign in to add a new one.</p>
   {{/if}}
-  {{> commentList }}
+  <div class="row">
+    {{> commentList }}
+  </div>
 </template>
 
+<!-- Comment form --------------------------------------------------------- -->
 
-
+<template name="commentModal">
+  <div class="modal fade" role="dialog" id="addCommentModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <form id="addCommentForm">
+            <div class="form-group">
+              <label for="comment">Comment:</label>
+              <textarea class="form-control" rows="3" id="comment"
+                        placeholder="Enter your comment here…"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm" data-dismiss="modal">Add comment</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</template>
 
 <!-- Template: Comment form ------------------------------------------------ -->
 
-<template name="commentForm">
+<template name="commentFormX">
   <div class="container">
     <div id="comment-form">
       <form>

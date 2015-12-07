@@ -53,23 +53,6 @@ Template.website_form.events({
 	}
 });
 
-Template.commentForm.events({
-	'submit #comment-form':function (event) {
-	  console.log(this);
-    if (Meteor.user()) {
-  		Comments.insert({
-  			text: event.target.comment.value,
-  			siteId: this._id,
-  			ownerId: Meteor.userId(),
-  			createdAt: new Date()
-  		});
-
-      console.log('Add comment:' + event.target.comment.value);
-    }
-		return false;
-	}
-});
-
 Template.commentSection.helpers({
 	commentCountMsg: function (siteId) {
     var count = Comments.find({ siteId: siteId }).count();
@@ -84,11 +67,46 @@ Template.commentSection.helpers({
 	}
 });
 
+Template.commentModal.events({
+	'submit #addCommentForm':function (event) {
+	  console.log(this);
+    if (Meteor.user()) {
+  		Comments.insert({
+  			text: event.target.comment.value,
+  			siteId: this._id,
+  			ownerId: Meteor.userId(),
+  			createdAt: new Date()
+  		});
+
+      console.log('Add comment:' + event.target.comment.value);
+    }
+		return false;
+	}
+});
+/*
+$('#addCommentForm').on('submit', function (event) {
+	  console.log(this);
+    if (Meteor.user()) {
+  		Comments.insert({
+  			text: event.target.comment.value,
+  			siteId: this._id,
+  			ownerId: Meteor.userId(),
+  			createdAt: new Date()
+  		});
+
+      console.log('Add comment:' + event.target.comment.value);
+    }
+		return false;
+	}
+);
+*/
 Template.commentList.helpers({
 	commentsByDateDesc: function (siteId) {
 		return Comments.find({ siteId: siteId }, { sort: { createdAt: -1 }});
 	}
 });
+
+// Common helpers.
 
 Template.registerHelper('getUsername', function (userId) {
   var user = Meteor.users.findOne({ _id: userId });

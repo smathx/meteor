@@ -58,7 +58,7 @@ Template.commentForm.events({
 	  console.log(this);
     if (Meteor.user()) {
   		Comments.insert({
-  			comment: event.target.comment.value,
+  			text: event.target.comment.value,
   			siteId: this._id,
   			ownerId: Meteor.userId(),
   			createdAt: new Date()
@@ -70,12 +70,23 @@ Template.commentForm.events({
 	}
 });
 
+Template.commentSection.helpers({
+	commentCountMsg: function (siteId) {
+    var count = Comments.find({ siteId: siteId }).count();
+
+    if (count == 0)
+      return 'There are no comments.';
+
+    if (count == 1)
+      return 'There is 1 comment.';
+
+    return 'There are ' + count + ' comments.';
+	}
+});
+
 Template.commentList.helpers({
-	comments: function (siteId) {
-		return Comments.find({ siteId: siteId});
-	},
-	commentCount: function (siteId) {
-		return Comments.find({ siteId: siteId }).count();
+	commentsByDateDesc: function (siteId) {
+		return Comments.find({ siteId: siteId }, { sort: { createdAt: -1 }});
 	}
 });
 
@@ -84,28 +95,42 @@ Template.registerHelper('getUsername', function (userId) {
   return user ? user.username : "anonymous";
 });
 
-// formatDate should convert a Date object to a reasonable date string - numeric
-// day, month string, and 4 digit year. The order, language and separators
-// depend on the user locale. For example, the fifth day of the twelfth month
-// in 2015 in the locale 'en-GB' returns '5 December 2015'.
+// formatDate should convert a Date object to a reasonable date string
+// numeric day, month string, and 4 digit year. The order, language and
+// separators depend on the user locale. For example, the fifth day of the
+// twelfth month in 2015 in the locale 'en-GB' returns '5 December 2015'.
 
 Template.registerHelper('formatDate', function (datetime) {
-  // ???? get user locale - iffy
-  var locale = navigator.language ||        // Chrome, Firefox, IE >= 11
-               navigator.userLanguage ||    // IE <= 10
-               navigator.browserLanguage;   // IE <= 10
+  // Gives a valid locale but not necessarily the right one
+  var locale = navigator.language ||      // Chrome, Firefox, IE >= 11
+               navigator.userLanguage ||  // IE <= 10
+               navigator.browserLanguage; // IE <= 10
 
-  console.log(locale);
+  // Should always be defined but fail gracefully if not.
+  if (!datetime)
+    return '<Date undefined>';
 
-  if (locale) {
-    var options = { day: "numeric", month: "long", year: "numeric" };
-    return datetime.toLocaleDateString(locale, options);
-  } else {
+  if (!locale)
     return datetime.toLocaleDateString();
-  }
+
+  var options = { day: "numeric", month: "long", year: "numeric" };
+  return datetime.toLocaleDateString(locale, options);
 });
 
-// accounts config
+Template.registerHelper('pluralise', function (number, singular, plural) {
+  if (typeof(plural) === 'undefined')
+    plural = singular + 's';
+
+  if (number == 0)
+    return 'no ' + plural;
+
+  if (number == 1)
+    return '1 ' + singular;
+
+  return number + plural;
+});
+
+// Accounts config
 
 Accounts.ui.config({
   passwordSignupFields: 'USERNAME_AND_EMAIL'

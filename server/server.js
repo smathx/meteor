@@ -1,5 +1,3 @@
-// Server only code
-
 /* global Websites:true, Comments:true */
 
 Meteor.startup(function () {
@@ -22,8 +20,9 @@ Meteor.startup(function () {
 
   // randomNumber() returns a random integer >= min and < max. If max is
   // undefined, the range defaults to 0 to min. Seeded by randomSeed.
-  // Note: The LCG is a relatively short period to avoid loss of precision
+  // Note: The period is relatively short to avoid loss of precision
   // when integers are greater than MAX_SAFE_INTEGER, 2^53-1 or 16 digits.
+  // The values for a, c, and m give a maximum integer < 2^34 bits.
 
   function randomNumber(min, max) {
       if (typeof(max) === 'undefined') {
@@ -39,7 +38,8 @@ Meteor.startup(function () {
       return Math.floor(min + (randomSeed / m) * (max - min));
   }
 
-  // Set the random seed to a specific value or random 6 digit value if undefined.
+  // Set the random seed to a specific value or a random 6 digit value if
+  // undefined.
 
   function seedRandomNumber(seed) {
     if (typeof(seed) === 'undefined')
@@ -55,7 +55,9 @@ Meteor.startup(function () {
     return userIds[randomNumber(userIds.length)]._id;
   }
 
-  // start is either a Date object or a String recognised by the Date() constructor.
+  // start is either a Date object or a String recognised by the Date()
+  // constructor.
+
   function randomDate(start) {
     var startDate = start || earliestDate;
 
@@ -68,7 +70,7 @@ Meteor.startup(function () {
   // Dummy users
 
   if (!Meteor.users.findOne()) {
-    console.log('Creating dummy user accounts.');
+    console.log('Creating dummy user accounts...');
 
     var names = ['Amy', 'Ben', 'Eva', 'Joe', 'Max', 'Mia', 'Sam', 'Zoe'];
 
@@ -84,7 +86,7 @@ Meteor.startup(function () {
   // Dummy websites
 
   if (!Websites.findOne()) {
-    console.log("Creating dummy website data.");
+    console.log("Creating dummy websites...");
 
     var sites = ['Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda',
       'Amazon', 'Ford', 'BP', 'Chevron', 'Walmart', 'Verizon'
@@ -106,12 +108,13 @@ Meteor.startup(function () {
   // Dummy comments
 
   if (!Comments.findOne()) {
-    console.log("Creating dummy comment data.");
+    console.log("Creating dummy comments...");
 
     Websites.find().forEach(function (site) {
-      for (var n = 1; n <= randomNumber(0, 10); n++) {
+      var count = randomNumber(10);
+      while (--count >= 0) {
         Comments.insert({
-          comment: 'Comment ' + randomNumber(1000000) + ' for ' + site.url,
+          text: '[Comment '+ randomNumber(1000000) +' for '+ site.url +']',
           siteId: site._id,
           ownerId: randomUserId(),
           createdAt: randomDate(site.createdAt)

@@ -21,7 +21,7 @@ Router.route('/sites/:_id', function () {
     to:"navbar"
   });
 
-  this.render('site-details', {
+  this.render('siteDetailsPage', {
     to:"main",
     data:function(){
       return Websites.findOne({_id:this.params._id});

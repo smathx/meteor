@@ -98,7 +98,7 @@
 
 <!-- Template: Individual site details ------------------------------------- -->
 
-<template name="site-details">
+<template name="siteDetailsPage">
   <div class="container">
     <a href="{{url}}">{{title}}</a>
     <p></p>
@@ -114,10 +114,25 @@
       First recommended by <span class="username">{{ getUsername(ownerId) }}</span> on
       {{formatDate(createdAt)}}
     </p>
-    {{> commentForm }}
-    {{> commentList }}
+    {{> commentSection }}
   </div>
 </template>
+
+<!-- Template: Comment form ------------------------------------------------ -->
+
+<template name="commentSection">
+  <h3>Comments</h3>
+  {{#if currentUser }}
+    <p>{{ commentCountMsg _id }}</p>
+    {{> commentForm }}
+  {{else}}
+    <p>{{ commentCountMsg _id }} Sign in to add one.</p>
+  {{/if}}
+  {{> commentList }}
+</template>
+
+
+
 
 <!-- Template: Comment form ------------------------------------------------ -->
 
@@ -127,8 +142,8 @@
       <form>
         <div class="form-group">
           <label for="comment">Comment:</label>
-          <textarea class="form-control" rows="5" id="comment">
-          </textarea>
+          <textarea class="form-control" rows="3" id="comment"
+                    placeholder="Enter your comment here…"></textarea>
         </div>
         <button type="submit" class="btn btn-default">Save</button>
       </form>
@@ -140,11 +155,17 @@
 
 <template name="commentList">
   <div class="container">
-    <ul>
-      {{ commentCount _id }} comments
-      {{#each comments _id }}
-        <li>{{ comment }}</li>
-      {{/each}}
-    </ul>
+    {{#each commentsByDateDesc _id }}
+      <div class="panel panel-default">
+        <div class="panel-body">
+          {{ text }}
+        </div>
+        <div class="panel-footer text-right">
+          {{ getUsername(ownerId) }}
+          &nbsp;·&nbsp;
+          {{ formatDate(createdAt) }}
+        </div>
+      </div>
+    {{/each}}
   </div>
 </template>

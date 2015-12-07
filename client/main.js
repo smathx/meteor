@@ -34,6 +34,7 @@ Template.website_item.events({
 
 Template.website_form.events({
 	'click .js-toggle-website-form':function (event) {
+	  console.log('toggle website form');
 		$('#website_form').toggle('slow');
 		//$('#url').get(0).setCustomValidity('Please enter a valid url');
 		//console.log($('#url').get());
@@ -53,6 +54,12 @@ Template.website_form.events({
 	}
 });
 
+Template.commentSection.events({
+	'click .js-toggle-comment-form':function (event) {
+		$('#addCommentForm').toggle('fast');
+	},
+});
+
 Template.commentSection.helpers({
 	commentCountMsg: function (siteId) {
     var count = Comments.find({ siteId: siteId }).count();
@@ -67,7 +74,7 @@ Template.commentSection.helpers({
 	}
 });
 
-Template.commentModal.events({
+Template.commentForm.events({
 	'submit #addCommentForm':function (event) {
 	  console.log(this);
     if (Meteor.user()) {
@@ -78,11 +85,13 @@ Template.commentModal.events({
   			createdAt: new Date()
   		});
 
-      console.log('Add comment:' + event.target.comment.value);
+      console.log('Add comment: "' + event.target.comment.value + '"');
     }
+		$('#addCommentForm').toggle('fast');
 		return false;
 	}
 });
+
 /*
 $('#addCommentForm').on('submit', function (event) {
 	  console.log(this);
@@ -110,7 +119,7 @@ Template.commentList.helpers({
 
 Template.registerHelper('getUsername', function (userId) {
   var user = Meteor.users.findOne({ _id: userId });
-  return user ? user.username : "anonymous";
+  return user ? user.username : 'anonymous';
 });
 
 // formatDate should convert a Date object to a reasonable date string
@@ -131,7 +140,7 @@ Template.registerHelper('formatDate', function (datetime) {
   if (!locale)
     return datetime.toLocaleDateString();
 
-  var options = { day: "numeric", month: "long", year: "numeric" };
+  var options = { day: 'numeric', month: 'long', year: 'numeric' };
   return datetime.toLocaleDateString(locale, options);
 });
 

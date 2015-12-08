@@ -1,8 +1,12 @@
-// Client code
-
 /* global Comments:true, Websites:true */
 
-// helpers
+//----------------------------------------------------------------------------
+
+Accounts.ui.config({
+  passwordSignupFields: 'USERNAME_AND_EMAIL'
+});
+
+//----------------------------------------------------------------------------
 
 // helper function that returns all available websites
 Template.website_list.helpers({
@@ -10,7 +14,6 @@ Template.website_list.helpers({
 		return Websites.find({}, { sort: { upVotes: -1, downVotes: 1 }});
 	}
 });
-
 
 // events
 
@@ -54,10 +57,13 @@ Template.website_form.events({
 	}
 });
 
+//----------------------------------------------------------------------------
+
 Template.commentSection.events({
-	'click .js-toggle-comment-form':function (event) {
-		$('#addCommentForm').toggle('fast');
-	},
+
+	'click .toggle-comment-form': function (event) {
+    $('#commentForm').toggle('fast');
+	}
 });
 
 Template.commentSection.helpers({
@@ -74,9 +80,10 @@ Template.commentSection.helpers({
 	}
 });
 
+//----------------------------------------------------------------------------
+
 Template.commentForm.events({
-	'submit #addCommentForm':function (event) {
-	  console.log(this);
+	'submit .save-comment-form': function (event) {
     if (Meteor.user()) {
   		Comments.insert({
   			text: event.target.comment.value,
@@ -87,40 +94,26 @@ Template.commentForm.events({
 
       console.log('Add comment: "' + event.target.comment.value + '"');
     }
-		$('#addCommentForm').toggle('fast');
+		$('#commentForm').toggle('fast');
+    event.target.comment.value = '';
 		return false;
+	},
+	'reset .toggle-comment-form': function (event) {
+    $('#commentForm').toggle('fast');
+    event.target.comment.value = '';
+    return false;
 	}
 });
 
-/*
-$('#addCommentForm').on('submit', function (event) {
-	  console.log(this);
-    if (Meteor.user()) {
-  		Comments.insert({
-  			text: event.target.comment.value,
-  			siteId: this._id,
-  			ownerId: Meteor.userId(),
-  			createdAt: new Date()
-  		});
+//----------------------------------------------------------------------------
 
-      console.log('Add comment:' + event.target.comment.value);
-    }
-		return false;
-	}
-);
-*/
 Template.commentList.helpers({
 	commentsByDateDesc: function (siteId) {
 		return Comments.find({ siteId: siteId }, { sort: { createdAt: -1 }});
 	}
 });
 
-// Common helpers.
-
-Template.registerHelper('getUsername', function (userId) {
-  var user = Meteor.users.findOne({ _id: userId });
-  return user ? user.username : 'anonymous';
-});
+//----------------------------------------------------------------------------
 
 // formatDate should convert a Date object to a reasonable date string
 // numeric day, month string, and 4 digit year. The order, language and
@@ -144,23 +137,9 @@ Template.registerHelper('formatDate', function (datetime) {
   return datetime.toLocaleDateString(locale, options);
 });
 
-Template.registerHelper('pluralise', function (number, singular, plural) {
-  if (typeof(plural) === 'undefined')
-    plural = singular + 's';
-
-  if (number == 0)
-    return 'no ' + plural;
-
-  if (number == 1)
-    return '1 ' + singular;
-
-  return number + plural;
-});
-
-// Accounts config
-
-Accounts.ui.config({
-  passwordSignupFields: 'USERNAME_AND_EMAIL'
+Template.registerHelper('getUsername', function (userId) {
+  var user = Meteor.users.findOne({ _id: userId });
+  return user ? user.username : 'anonymous';
 });
 
 //end

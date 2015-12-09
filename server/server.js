@@ -1,4 +1,12 @@
 /* global Websites:true, Comments:true */
+/* global _ */
+
+Meteor.methods({
+  "httpGetUrl" : function(url){
+    this.unblock();
+    return HTTP.get(url);
+  }
+});
 
 Meteor.startup(function () {
 
@@ -66,6 +74,106 @@ Meteor.startup(function () {
 
     return new Date(randomNumber(startDate.getTime(), Date.now()));
   }
+/*
+  function getSiteTitle(name) {
+    var title;
+    var url = 'http://www.' + name + '.com';
+
+    console.log('  ' + name);
+
+    Meteor.call('httpGetUrl', url, function (error, result) {
+      if (!error) {
+        title = _.unescape(result.content.match(/<title[^>]*>[\n\s]*(.*)[\n\s]*<\/title>/im)[1]);
+      }
+      else
+        console.log('\t' + error);
+    });
+
+    if (title)
+      return name + ': ' + title;
+    else
+      return name;
+  }
+
+  function getSiteDescription(name) {
+    var description;
+    var url = 'http://www.' + name + '.com';
+
+    console.log('  ' + name);
+
+    Meteor.call('httpGetUrl', url, function (error, result) {
+      if (error)
+        console.log('\t' + error);
+      else {
+        var regex = [
+          /<meta[^>]*\bname="description"[^>]*\bcontent="([^"]*)"[^>]*>/i,
+          /<meta[^>]*\bcontent="([^"]*)"[^>]*\bname="description"[^>]*>/i
+        ];
+
+        regex.some(function (r) {
+          return description = result.content.match(r);
+        });
+
+        if (!description)
+          console.log('\t No description meta tag found')
+        else
+          description = _.unescape(description[1]);
+      }
+    });
+*/
+  function getSiteData(url) {
+    var data = { error: 'GET failed on ' + url };
+
+    console.log(url);
+
+    Meteor.call('httpGetUrl', url, function (error, result) {
+      data.error = error;
+
+      if (!error) {
+        var titleMatch = [
+          /<title[^>]*>[\n\s]*(.*)[\n\s]*<\/title>/im
+        ];
+
+        titleMatch.some(function (r) {
+          return data.title = result.content.match(r);
+        });
+
+        var descriptionMatch = [
+          /<meta[^>]*\bname="description"[^>]*\bcontent="([^"]*)"[^>]*>/i,
+          /<meta[^>]*\bcontent="([^"]*)"[^>]*\bname="description"[^>]*>/i
+        ];
+
+        descriptionMatch.some(function (r) {
+          return data.description = result.content.match(r);
+        });
+      }
+    });
+    return data;
+  }
+
+  function getSiteTitle(name) {
+    var result = getSiteData('http://www.' + name + '.com');
+
+    if (result.error)
+      console.log(result.error);
+
+    if (result.title)
+      return name + ': ' + _.unescape(result.title[1]);
+    else
+      return name;
+  }
+
+  function getSiteDescription(name) {
+    var result = getSiteData('http://www.' + name + '.com');
+
+    if (result.error)
+      console.log(result.error);
+
+    if (result.description)
+      return _.unescape(result.description[1]);
+    else
+      return 'This is a description of the ' + name + ' website.';
+  }
 
   // Dummy users
 
@@ -94,9 +202,9 @@ Meteor.startup(function () {
 
     sites.forEach(function (name) {
       Websites.insert({
-        title: name,
+        title: getSiteTitle(name),
         url: 'http://www.' + name.toLowerCase() + '.com',
-        description: 'This is the website for ' + name,
+        description: getSiteDescription(name),
         upVotes: randomNumber(10),
         downVotes: randomNumber(5),
         ownerId: randomUserId(),

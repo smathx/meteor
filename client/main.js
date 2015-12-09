@@ -20,7 +20,6 @@ Template.website_list.helpers({
 Template.website_item.events({
 	'click .js-upvote':function (event) {
 		var website_id = this._id;
-		console.log('Up voting website with id '+website_id);
 
 		Websites.update({_id:website_id}, { $inc: { upVotes: 1}});
 		return false;
@@ -28,7 +27,6 @@ Template.website_item.events({
 
 	'click .js-downvote':function (event) {
 		var website_id = this._id;
-		console.log('Down voting website with id '+website_id);
 
 		Websites.update({_id:website_id}, { $inc: { downVotes: 1}});
 		return false;
@@ -140,6 +138,16 @@ Template.registerHelper('formatDate', function (datetime) {
 Template.registerHelper('getUsername', function (userId) {
   var user = Meteor.users.findOne({ _id: userId });
   return user ? user.username : 'anonymous';
+});
+
+Template.registerHelper('getSiteTitle', function (url){
+  var title = '';
+
+  Meteor.call('httpGetUrl', url, function (error, result) {
+    if (!error)
+      title = result.content.split('<title>')[1].split('</title>')[0];
+  });
+  return title;
 });
 
 //end

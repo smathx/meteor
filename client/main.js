@@ -33,12 +33,33 @@ Template.website_item.events({
 	}
 });
 
+//----------------------------------------------------------------------------
+
 Template.website_form.events({
 	'click .js-toggle-website-form':function (event) {
 	  console.log('toggle website form');
 		$('#website_form').toggle('slow');
-		//$('#url').get(0).setCustomValidity('Please enter a valid url');
-		//console.log($('#url').get());
+	},
+
+	'click #get-data':function (event) {
+	  var url = $('#url').val();
+	  console.log('get-data: ' + url);
+
+    if (url) {
+      url = url.trim();
+
+      if (url.length > 0) {
+        Meteor.call('getSiteData', url, function (error, result) {
+          console.log(error);
+          console.log(result);
+
+          if (!error) {
+            $('#title').val(result.title);
+            $('#description').val(result.description);
+          }
+        });
+      }
+    }
 	},
 
 	'submit .js-save-website-form':function (event) {
@@ -53,6 +74,14 @@ Template.website_form.events({
 		$('#website_form').toggle('slow');
 		return false;
 	}
+});
+
+Template.website_form.helpers('getSiteData', function (url) {
+  var data;
+  Meteor.call('getSiteData', url, function (error, result) {
+    data = result;
+  });
+  return data;
 });
 
 //----------------------------------------------------------------------------
@@ -138,16 +167,6 @@ Template.registerHelper('formatDate', function (datetime) {
 Template.registerHelper('getUsername', function (userId) {
   var user = Meteor.users.findOne({ _id: userId });
   return user ? user.username : 'anonymous';
-});
-
-Template.registerHelper('getSiteTitle', function (url){
-  var title = '';
-
-  Meteor.call('httpGetUrl', url, function (error, result) {
-    if (!error)
-      title = result.content.split('<title>')[1].split('</title>')[0];
-  });
-  return title;
 });
 
 //end

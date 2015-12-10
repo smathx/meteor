@@ -70,6 +70,10 @@ function toggleWebsiteForm() {
 	});
 }
 
+Template.websiteForm.onRendered(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
 //----------------------------------------------------------------------------
 
 Template.websiteList.helpers({

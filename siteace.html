@@ -60,23 +60,37 @@
 <template name="websiteForm">
   <div class="container">
     <div id="websiteForm" class="hidden_div">
-      <form class="js-save-website-form">
-        <div class="form-group">
-          <label for="url">Site address</label>
-          <input type="url" class="form-control" id="url" required placeholder="http://www.mysite.com">
+      <div class="row">
+        <div class="col-xs-12">
+          <form class="js-save-website-form">
+
+            <div class="form-group">
+              <label for="url">Site address</label>
+              <div class="input-group">
+                <input type="url" class="form-control" id="url" required placeholder="http://www.mysite.com">
+                <span class="input-group-btn">
+                  <button type="button" data-toggle="tooltip" data-container="body"
+                    title="Some tooltip text!"
+                    class="btn btn-default btn-info js-get-site-data">Get data</button>
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" class="form-control" id="title" placeholder="Mysite">
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" rows="3" id="description" required placeholder="I found this site really useful for…"></textarea>
+            </div>
+
+            <button type="button" class="btn btn-default btn-sm js-toggle-website-form">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="title">Title</label>
-          <input type="text" class="form-control" id="title" placeholder="Mysite">
-        </div>
-        <div class="form-group">
-          <label for="description">Description</label>
-          <textarea class="form-control" rows="3" id="description" required placeholder="I found this site really useful for…"></textarea>
-        </div>
-        <button type="button" class="btn btn-default btn-sm js-get-site-data">Get data</button>
-        <button type="button" class="btn btn-default btn-sm js-toggle-website-form">Cancel</button>
-        <button type="submit" class="btn btn-primary btn-sm">Submit</button>
-      </form>
+      </div>
     </div>
   </div>
 </template>

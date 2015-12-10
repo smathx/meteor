@@ -8,6 +8,10 @@ Accounts.ui.config({
 
 //----------------------------------------------------------------------------
 
+Template.websitesPage.events({
+	'click .js-toggle-website-form': toggleWebsiteForm
+});
+
 Template.websitesPage.helpers({
 	websiteCountMsg: function () {
     var count = Websites.find().count();
@@ -21,6 +25,50 @@ Template.websitesPage.helpers({
     return 'There are ' + count + ' recommended websites.';
 	}
 });
+
+//----------------------------------------------------------------------------
+
+Template.websiteForm.events({
+	'click .js-get-site-data':function (event) {
+	  var url = $('#url').val();
+	  console.log('get-site-data: ' + url);
+
+    if (url) {
+      url = url.replace(/^\s*(http(s?):[\\/]*)?\s*(.*)\b\s*$/i,'http$2://$3')
+
+      if (url.search(/^https?:\/\/$/) == -1) {
+        Meteor.call('getSiteData', url, function (error, result) {
+          if (!error) {
+            $('#url').val(url);
+            $('#title').val(result.title);
+            $('#description').val(result.description);
+          }
+        });
+      }
+    }
+	},
+
+	'submit .js-save-website-form':function (event) {
+
+		Websites.insert({
+			title: event.target.title.value,
+			url: event.target.url.value,
+			description: event.target.description.value,
+			upVotes: 0,
+			downVotes: 0,
+			ownerId: Meteor.userId(),
+			createdAt: new Date()
+		});
+		toggleWebsiteForm();
+		return false;
+	}
+});
+
+function toggleWebsiteForm() {
+	$('#websiteForm').toggle('fast', function () {
+    $('#url, #title, #description').val('');
+	});
+}
 
 //----------------------------------------------------------------------------
 
@@ -50,49 +98,7 @@ Template.websiteItem.events({
 
 //----------------------------------------------------------------------------
 
-Template.websiteForm.events({
-	'click .js-toggle-website-form':function (event) {
-	  console.log('toggle website form');
-		$('#websiteForm').toggle('slow');
-	},
-
-	'click #get-data':function (event) {
-	  var url = $('#url').val();
-	  console.log('get-data: ' + url);
-
-    if (url) {
-      url = url.replace(/^\s*(http(s?):[\\/]*)?\s*(.*)\b\s*$/i,'http$2://$3')
-
-      if (url.search(/^https?:\/\/$/) == -1) {
-        Meteor.call('getSiteData', url, function (error, result) {
-          if (!error) {
-            $('#url').val(url);
-            $('#title').val(result.title);
-            $('#description').val(result.description);
-          }
-        });
-      }
-    }
-	},
-
-	'submit .js-save-website-form':function (event) {
-
-		Websites.insert({
-			title: event.target.title.value,
-			url: event.target.url.value,
-			description: event.target.description.value,
-			ownerId: Meteor.userId(),
-			createdAt: new Date()
-		});
-		$('#websiteForm').toggle('slow');
-		return false;
-	}
-});
-
-//----------------------------------------------------------------------------
-
 Template.commentSection.events({
-
 	'click .toggle-comment-form': function (event) {
     $('#commentForm').toggle('fast');
 	}

@@ -43,6 +43,20 @@ function getSiteData(url) {
       ];
 
       data.description = matchAny(result.content, descriptionMatch);
+
+      // Dump missing titles and descriptions to console to tweek regex
+
+      if (!data.title) {
+        console.log(url + ' no title found');
+        console.log(result.content.match(/(.{1,20}\btitle\b.{1,20})/img));
+      }
+
+      if (!data.description) {
+        console.log(url + ' no description found');
+        result.content.match(/<meta[^>]*>/ig).forEach(function (meta) {
+          console.log(meta);
+        });
+      }
     }
   });
 
@@ -119,26 +133,23 @@ Meteor.startup(function () {
     return new Date(randomNumber(startDate.getTime(), Date.now()));
   }
 
-  function getSiteTitle(name, data) {
-    if (data.title)
-      return name + ': ' + data.title;
-    else
-      return name;
-  }
-
-  function getSiteDescription(name, data) {
-    if (data.description)
-      return data.description;
-    else
-      return 'This is a description of the ' + name + ' website.';
-  }
-
   // Dummy users
 
   if (!Meteor.users.findOne()) {
     console.log('Creating dummy user accounts...');
 
-    var names = ['Amy', 'Ben', 'Eva', 'Joe', 'Max', 'Mia', 'Sam', 'Zoe'];
+    // How many 3 letter names can there be...
+
+    var names = [
+      'Ada', 'Ali', 'Amy', 'Ann', 'Bea', 'Ben', 'Bob', 'Bud', 'Cal', 'Che',
+      'Dan', 'Dee', 'Dot', 'Eli', 'Eve', 'Eva', 'Fay', 'Gus', 'Guy', 'Hal',
+      'Han', 'Huw', 'Ian', 'Ida', 'Ira', 'Ivy', 'Jan', 'Jay', 'Jen', 'Jim',
+      'Joe', 'Jon', 'Joy', 'Kai', 'Kay', 'Ken', 'Kim', 'Lee', 'Len', 'Leo',
+      'Les', 'Lou', 'Lyn', 'Mae', 'Max', 'May', 'Meg', 'Mel', 'Mia', 'Ned',
+      'Pam', 'Pip', 'Rab', 'Raj', 'Ray', 'Rex', 'Rob', 'Rod', 'Ron', 'Roy',
+      'Sal', 'Sam', 'Sia', 'Sid', 'Sue', 'Tam', 'Tea', 'Tom', 'Uri', 'Val',
+      'Vin', 'Wes', 'Wyn', 'Zak', 'Zoe'
+    ];
 
     names.forEach(function (name) {
       Accounts.createUser({
@@ -154,8 +165,12 @@ Meteor.startup(function () {
   if (!Websites.findOne()) {
     console.log("Creating dummy websites...");
 
-    var sites = ['Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda',
-      'Amazon', 'Ford', 'BP', 'Chevron', 'Walmart', 'Verizon'
+    // Takes too long too load if there are too many sites to look up.
+
+    var sites = [
+      'Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda', 'ABC', 'CBS', 'BA',
+      'Amazon', 'Ford', 'BP', 'Chevron', 'Walmart', 'Verizon', 'Virgin',
+      'Yahoo'
     ];
 
     sites.forEach(function (name) {
@@ -164,9 +179,9 @@ Meteor.startup(function () {
       var data = getSiteData(url);
 
       Websites.insert({
-        title: getSiteTitle(name, data),
+        title: name + ': ' + data.title,
         url: url,
-        description: getSiteDescription(name, data),
+        description: data.description ? data.description: 'No description found.',
         upVotes: randomNumber(10),
         downVotes: randomNumber(5),
         ownerId: randomUserId(),

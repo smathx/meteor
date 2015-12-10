@@ -14,11 +14,10 @@
 
 <template name="ApplicationLayout">
   {{> yield "navbar"}}
-  {{> yield "add-site-form"}}
   {{> yield "main"}}
+  {{> yield "list"}}
+  {{> yield "footer"}}
 </template>
-
-<!-- Template: navbar ------------------------------------------------------ -->
 
 <template name="navbar">
   <nav class="navbar navbar-default">
@@ -35,69 +34,90 @@
   </nav>
 </template>
 
-
-<template name="website_form">
+<template name="websitesPage">
   <div class="container">
-  <a class="btn btn-default js-toggle-website-form" href="#">
+    <h3>Recommended Websites</h3>
+    {{#if currentUser }}
+      <div class="row">
+        <div class="col-xs-9">
+          <p>{{ websiteCountMsg }}</p>
+        </div>
+        <div class="col-xs-3">
+          <button type="button"
+                  class="btn btn-primary btn-sm pull-right toggle-comment-form">
+            Recommend new website…
+          </button>
+        </div>
+      </div>
+      {{> websiteForm }}
+      <br>
+    {{else}}
+      <p>{{ websiteCountMsg }} Sign in to add a new one.</p>
+    {{/if}}
+  </div>
+  {{> websiteList }}
+</template>
+
+<template name="websiteForm">
+  <div class="container">
+    <a class="btn btn-default js-toggle-website-form" href="#">
       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-  </a>
-  <div id="website_form" class="hidden_div">
-    <form class="js-save-website-form">
-      <div class="form-group">
-        <label for="url">Site address</label>
-        <input type="url" class="form-control" id="url" required placeholder="http://www.mysite.com">
-      </div>
-      <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" class="form-control" id="title" placeholder="Mysite">
-      </div>
+    </a>
+    <div id="websiteForm" class="hidden_div">
+      <form class="js-save-website-form">
         <div class="form-group">
-        <label for="description">Description</label>
-        <textarea class="form-control" rows="3" id="description" required
-            placeholder="I found this site really useful for…"></textarea>
-      </div>
+          <label for="url">Site address</label>
+          <input type="url" class="form-control" id="url" required placeholder="http://www.mysite.com">
+        </div>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" class="form-control" id="title" placeholder="Mysite">
+        </div>
+          <div class="form-group">
+          <label for="description">Description</label>
+          <textarea class="form-control" rows="3" id="description" required
+              placeholder="I found this site really useful for…"></textarea>
+        </div>
 
-      <button type="button" class="btn btn-default" id="get-data">Get data</button>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-  </div>
+        <button type="button" class="btn btn-default" id="get-data">Get data</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
   </div>
 </template>
 
-<!-- template that displays several website items -->
-<template name="website_list">
+<template name="websiteList">
   <div class="container">
-
-  <ol>
-  {{#each websites}}
-  {{>website_item}}
-  {{/each}}
-  </ol>
+    <ol>
+      {{#each websites}}
+      {{>websiteItem}}
+      {{/each}}
+    </ol>
   </div>
 </template>
 
-<!-- template that displays individual website entries -->
-<template name="website_item">
-<li>
-  <a href="{{url}}">{{title}}</a>
-  <p>
-    {{description}}
-  </p>
-  <a href="#" class="btn btn-default js-upvote">
-    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
-  </a>
-  <a href="#" class="btn btn-default js-downvote">
-    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-  </a>
-  <!-- you will be putting your up and down vote buttons in here! -->
-  <a href="sites/{{_id}}">More details</a>
-  <p>
-    Up votes: {{upVotes}}, Down votes: {{downVotes}},
-    Added by <span class="username">{{ getUsername(ownerId) }}</span> on
-    {{formatDate(createdAt)}}
-  </p>
-</li>
+<template name="websiteItem">
+  <li>
+    <a href="{{url}}">{{title}}</a>
+    <p>
+      {{description}}
+    </p>
+    <a href="#" class="btn btn-default js-upvote">
+      <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+    </a>
+    <a href="#" class="btn btn-default js-downvote">
+      <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+    </a>
+    <a href="sites/{{_id}}">More details</a>
+    <p>
+      Up votes: {{upVotes}}, Down votes: {{downVotes}},
+      Added by <span class="username">{{ getUsername(ownerId) }}</span> on
+      {{formatDate(createdAt)}}
+    </p>
+  </li>
 </template>
+
+<!-- Templates for site details, comments, and comment form -->
 
 <template name="siteDetailsPage">
   <div class="container">
@@ -117,25 +137,25 @@
 </template>
 
 <template name="commentSection">
-    <h3>Comments</h3>
-    {{#if currentUser }}
-      <div class="row">
-        <div class="col-xs-9">
-          <p>{{ commentCountMsg _id }}</p>
-        </div>
-        <div class="col-xs-3">
-          <button type="button"
-                  class="btn btn-primary btn-sm pull-right toggle-comment-form">
-            Add new comment&hellip;
-          </button>
-        </div>
+  <h3>Comments</h3>
+  {{#if currentUser }}
+    <div class="row">
+      <div class="col-xs-9">
+        <p>{{ commentCountMsg _id }}</p>
       </div>
-      {{> commentForm }}
-      <br>
-    {{else}}
-      <p>{{ commentCountMsg _id }} Sign in to add a new one.</p>
-    {{/if}}
-    {{> commentList }}
+      <div class="col-xs-3">
+        <button type="button"
+                class="btn btn-primary btn-sm pull-right toggle-comment-form">
+          Add new comment…
+        </button>
+      </div>
+    </div>
+    {{> commentForm }}
+    <br>
+  {{else}}
+    <p>{{ commentCountMsg _id }} Sign in to add a new one.</p>
+  {{/if}}
+  {{> commentList }}
 </template>
 
 <template name="commentForm">

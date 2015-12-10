@@ -8,16 +8,31 @@ Accounts.ui.config({
 
 //----------------------------------------------------------------------------
 
-// helper function that returns all available websites
-Template.website_list.helpers({
+Template.websitesPage.helpers({
+	websiteCountMsg: function () {
+    var count = Websites.find().count();
+
+    if (count == 0)
+      return 'There are no recommended websites.';
+
+    if (count == 1)
+      return 'There is 1 recommended website.';
+
+    return 'There are ' + count + ' recommended websites.';
+	}
+});
+
+//----------------------------------------------------------------------------
+
+Template.websiteList.helpers({
 	websites:function () {
 		return Websites.find({}, { sort: { upVotes: -1, downVotes: 1 }});
 	}
 });
 
-// events
+//----------------------------------------------------------------------------
 
-Template.website_item.events({
+Template.websiteItem.events({
 	'click .js-upvote':function (event) {
 		var website_id = this._id;
 
@@ -35,10 +50,10 @@ Template.website_item.events({
 
 //----------------------------------------------------------------------------
 
-Template.website_form.events({
+Template.websiteForm.events({
 	'click .js-toggle-website-form':function (event) {
 	  console.log('toggle website form');
-		$('#website_form').toggle('slow');
+		$('#websiteForm').toggle('slow');
 	},
 
 	'click #get-data':function (event) {
@@ -46,14 +61,12 @@ Template.website_form.events({
 	  console.log('get-data: ' + url);
 
     if (url) {
-      url = url.trim();
+      url = url.replace(/^\s*(http(s?):[\\/]*)?\s*(.*)\b\s*$/i,'http$2://$3')
 
-      if (url.length > 0) {
+      if (url.search(/^https?:\/\/$/) == -1) {
         Meteor.call('getSiteData', url, function (error, result) {
-          console.log(error);
-          console.log(result);
-
           if (!error) {
+            $('#url').val(url);
             $('#title').val(result.title);
             $('#description').val(result.description);
           }
@@ -71,17 +84,9 @@ Template.website_form.events({
 			ownerId: Meteor.userId(),
 			createdAt: new Date()
 		});
-		$('#website_form').toggle('slow');
+		$('#websiteForm').toggle('slow');
 		return false;
 	}
-});
-
-Template.website_form.helpers('getSiteData', function (url) {
-  var data;
-  Meteor.call('getSiteData', url, function (error, result) {
-    data = result;
-  });
-  return data;
 });
 
 //----------------------------------------------------------------------------

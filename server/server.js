@@ -11,47 +11,46 @@ Meteor.methods({
   }
 });
 
-  // Checks a string against a list of regex's returning with the first
-  // matching group, unescaped.
+// Checks a string against a list of regex's returning with the first
+// matching group, unescaped.
 
-  function matchAny(str, regexList) {
-    var found;
-    regexList.some(function (r) {
-      return found = str.match(r);
-    });
-    return found ? _.unescape(found[1]): found;
-  }
+function matchAny(str, regexList) {
+  var found;
+  regexList.some(function (r) {
+    return found = str.match(r);
+  });
+  return found ? _.unescape(found[1]): found;
+}
 
-  function getSiteData(url) {
-    var data = { error: 'GET failed on ' + url };
+function getSiteData(url) {
+  var data = { error: 'GET failed on ' + url };
 
-    console.log(url);
+  console.log('getSiteData: ' + url);
 
-    Meteor.call('httpGetUrl', url, function (error, result) {
-      data.error = error;
+  Meteor.call('httpGetUrl', url, function (error, result) {
+    data.error = error;
 
-      if (!error) {
-        var titleMatch = [
-          /<title[^>]*>[\n\s]*(.*)[\n\s]*<\/title>/im
-        ];
+    if (!error) {
+      var titleMatch = [
+        /<title[^>]*>[\n\s]*(.*)[\n\s]*<\/title>/im
+      ];
 
-        data.title = matchAny(result.content, titleMatch);
+      data.title = matchAny(result.content, titleMatch);
 
-        var descriptionMatch = [
-          /<meta[^>]*\bname="description"[^>]*\bcontent="([^"]*)"[^>]*>/i,
-          /<meta[^>]*\bcontent="([^"]*)"[^>]*\bname="description"[^>]*>/i
-        ];
+      var descriptionMatch = [
+        /<meta[^>]*\bname="description"[^>]*\bcontent="([^"]*)"[^>]*>/i,
+        /<meta[^>]*\bcontent="([^"]*)"[^>]*\bname="description"[^>]*>/i
+      ];
 
-        data.description = matchAny(result.content, descriptionMatch);
-      }
-    });
+      data.description = matchAny(result.content, descriptionMatch);
+    }
+  });
 
-    console.log(data);
-    if (data.error)
-      console.log(data.error);
+  if (data.error)
+    console.log('getSiteData: ' + data.error);
 
-    return data;
-  }
+  return data;
+}
 
 Meteor.startup(function () {
 

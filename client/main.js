@@ -30,21 +30,20 @@ Template.websitesPage.helpers({
 
 Template.websiteForm.events({
 	'click .js-get-site-data':function (event) {
-	  var url = $('#url').val();
+	  var url = getUrl($('#url').val());
 	  console.log('get-site-data: ' + url);
 
-    if (url) {
-      url = url.replace(/^\s*(http(s?):[\\/]*)?\s*(.*)\b\s*$/i,'http$2://$3')
+    $('#title').val('');
+    $('#description').val('');
 
-      if (url.search(/^https?:\/\/$/) == -1) {
-        Meteor.call('getSiteData', url, function (error, result) {
-          if (!error) {
-            $('#url').val(url);
-            $('#title').val(result.title);
-            $('#description').val(result.description);
-          }
-        });
-      }
+    if (url) {
+      Meteor.call('getSiteData', url, function (error, result) {
+        if (!error) {
+          $('#url').val(url);
+          $('#title').val(result.title);
+          $('#description').val(result.description);
+        }
+      });
     }
 	},
 
@@ -64,15 +63,32 @@ Template.websiteForm.events({
 	}
 });
 
+Template.websiteForm.onRendered(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+
+  $('#url').focusout(function (event) {
+    $('#url').val(getUrl(event.target.value));
+  });
+});
+
 function toggleWebsiteForm() {
 	$('#websiteForm').toggle('fast', function () {
     $('#url, #title, #description').val('');
 	});
 }
 
-Template.websiteForm.onRendered(function () {
-  $('[data-toggle="tooltip"]').tooltip();
-});
+function getUrl(url) {
+  if (url) {
+    url = url.replace(/^\s*(http(s?):[\\/]*)?\s*(.*)\b\s*$/i,'http$2://$3');
+
+    if (url.search(/^https?:\/\/$/) != -1)
+      url = '';
+
+    else if (url.indexOf('.') == -1)
+      url += '.com';
+  }
+  return url;
+}
 
 //----------------------------------------------------------------------------
 

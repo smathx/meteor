@@ -34,6 +34,8 @@
   </nav>
 </template>
 
+<!-- Templates for website list and form -->
+
 <template name="websitesPage">
   <div class="container">
     <h3>Recommended Websites</h3>
@@ -67,11 +69,15 @@
             <div class="form-group">
               <label for="url">Site address</label>
               <div class="input-group">
-                <input type="url" class="form-control" id="url" required placeholder="http://www.mysite.com">
+                <input type="url" class="form-control" id="url" required
+                  placeholder="http://www.mysite.com">
                 <span class="input-group-btn">
-                  <button type="button" data-toggle="tooltip" data-container="body"
-                    title="Some tooltip text!"
-                    class="btn btn-default btn-info js-get-site-data">Get data</button>
+                  <button type="button"
+                    class="btn btn-default btn-info js-get-site-data"
+                    data-toggle="tooltip" data-placement="bottom"
+                    data-container="body"
+                    title="Get title and description from website">
+                    Get data</button>
                 </span>
               </div>
             </div>
@@ -97,33 +103,49 @@
 
 <template name="websiteList">
   <div class="container">
-    <ol>
+    <ol class="list-group">
       {{#each websites}}
-      {{>websiteItem}}
+        {{>websiteItem}}
       {{/each}}
     </ol>
   </div>
 </template>
 
 <template name="websiteItem">
-  <li>
-    <a href="{{url}}">{{title}}</a>
-    <p>
-      {{description}}
-    </p>
-    <a href="#" class="btn btn-default js-upvote">
-      <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
-    </a>
-    <a href="#" class="btn btn-default js-downvote">
-      <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-    </a>
-    <a href="sites/{{_id}}">More details</a>
-    <p>
-      Up votes: {{upVotes}}, Down votes: {{downVotes}},
-      Added by <span class="username">{{ getUsername(ownerId) }}</span> on
-      {{formatDate(createdAt)}}
-    </p>
-  </li>
+  <div class="row">
+    <div class="col-xs-12">
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col-xs-12 col-sm-9">
+            <a href="{{url}}">{{title}}</a>
+          </div>
+          <div class="col-xs-1 col-sm-1 text-center">
+            <a href="#" class="btn btn-default btn-xs btn-success js-upvote"
+              data-toggle="tooltip" data-placement="bottom"
+              title="Click to vote up">
+              {{upVotes}}
+            </a>
+          </div>
+          <div class="col-xs-1 col-sm-1 text-center">
+            <a href="#" class="btn btn-default btn-xs btn-danger js-downvote"
+              data-toggle="tooltip" data-placement="bottom"
+              title="Click to vote down">
+              {{downVotes}}
+            </a>
+          </div>
+          <div class="col-xs-2 col-xs-offset-8 col-sm-1 col-sm-offset-0 text-center"
+              data-toggle="tooltip" data-placement="bottom"
+              title="More details and comments">
+            <a href="sites/{{_id}}">More&hellip;</a>
+          </div>
+        </div>
+        <p>
+          Added by <span class="username">{{ getUsername(ownerId) }}</span> on
+          {{formatDate(createdAt)}}
+        </p>
+      </li>
+    </div>
+  </div>
 </template>
 
 <!-- Templates for site details, comments, and comment form -->

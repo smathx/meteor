@@ -2,12 +2,15 @@
 /* global _ */
 
 Meteor.methods({
-  "httpGetUrl" : function (url) {
+  'httpGetUrl': function (url) {
     this.unblock();
     return HTTP.get(url);
   },
-  "getSiteData" : function (url) {
+  'getSiteData': function (url) {
     return getSiteData(url);
+  },
+  'search': function (text) {
+    return search(text);
   }
 });
 
@@ -69,6 +72,21 @@ function getSiteData(url) {
 
   return data;
 }
+
+/* global WebsitesIndex */
+// The search is done on the server as it seems erratic on the client,
+// returning no match, then several a couple of seconds later.
+function search(text) {
+  console.log('search: ' + text);
+  return WebsitesIndex
+    .search(text, { limit: 0 })
+    .fetch()
+    .sort(function (a, b) {
+      return a.title.localeCompare(b.title);
+    });
+}
+
+//-----------------------------------------------------------------------------
 
 Meteor.startup(function () {
 

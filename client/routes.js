@@ -17,9 +17,6 @@ Router.route('/search', function () {
   this.render('searchPage', {
     to:'main'
   });
-  this.render('searchResults', {
-    to:'list'
-  });
 });
 
 Router.route('/sites/:_id', function () {

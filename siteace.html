@@ -201,7 +201,7 @@
       </li>
       <li class="active">Search</li>
     </ol>
-    <h3>Search Websites</h3>
+    <h3>Search Site Ace</h3>
     <div class="row">
       <div class="col-xs-12">
         <form class="js-search-form">
@@ -222,17 +222,35 @@
         </form>
       </div>
     </div>
+
+    {{> searchResults }}
   </div>
 </template>
 
 <template name="searchResults">
-  <div class="container">
-    <ol class="list-group">
-      {{#each websites}}
-        {{>websiteItem}}
-      {{/each}}
-    </ol>
+  <div class="row">
+    <div class="col-xs-12">
+      <p>{{ sitesFoundCountMsg }}</p>
+      <ol class="list-group">
+        {{#each sitesFound }}
+          {{>searchResult}}
+        {{/each}}
+      </ol>
+    </div>
   </div>
+</template>
+
+<template name="searchResult">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-xs-12 col-sm-10">
+        <a href="{{url}}">{{title}}</a>
+      </div>
+      <div class="col-xs-4 col-xs-offset-8 col-sm-2 col-sm-offset-0 text-center">
+        <a href="sites/{{_id}}">More&hellip;</a>
+      </div>
+    </div>
+  </li>
 </template>
 
 <!-- Templates for site details, comments, and comment form -->
@@ -323,7 +341,8 @@
       <div class="navbar-header">
         <p class="navbar-text">
           Final assignment for the
-          <a href="https://www.coursera.org/learn/meteor-development/home/welcome">
+          <a href="https://www.coursera.org/learn/meteor-development/home/welcome"
+            class="navbar-link">
           Coursera 'Introduction to Meteor.js Development'
           </a> course.
           Source code on

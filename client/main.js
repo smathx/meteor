@@ -174,6 +174,54 @@ Template.commentList.helpers({
 
 //----------------------------------------------------------------------------
 
+Template.searchPage.events({
+	'submit .js-search-form': function (event) {
+	  var text = event.target.search.value;
+
+    console.log('Searching for: "' + text + '"');
+
+	  Meteor.call('search', text, function (error, result) {
+	    if (error)
+	      result = '';
+
+	    Session.set('searchResults', result);
+	    Session.set('searchResultsCount', result.length);
+	  });
+	  return false;
+	}
+});
+
+Template.searchPage.onDestroyed(function () {
+  Session.set('searchResults', undefined);
+  Session.set('searchResultsCount', 0);
+});
+
+Template.searchResults.helpers({
+	sitesFoundCountMsg: function () {
+    var count = Session.get('searchResultsCount');
+
+    if (!count || (count == 0))
+      return 'No matching websites found.';
+
+    if (count == 1)
+      return '1 matching website found.';
+
+    return count + ' matching websites found.';
+	}
+});
+
+Template.searchResults.helpers({
+	sitesFound: function () {
+	  return Session.get('searchResults');
+	}
+});
+
+//Template.searchPage.onRendered(function () {
+//  $('.js-search-form input').addClass('form-control');
+//});
+
+//----------------------------------------------------------------------------
+
 // formatDate should convert a Date object to a reasonable date string
 // numeric day, month string, and 4 digit year. The order, language and
 // separators depend on the user locale. For example, the fifth day of the

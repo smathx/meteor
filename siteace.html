@@ -13,14 +13,14 @@
 </body>
 
 <template name="ApplicationLayout">
-  {{> yield "navbar"}}
+  {{> navbar }}
   {{> yield "main"}}
   {{> yield "list"}}
-  {{> yield "footer"}}
+  {{> footer }}
 </template>
 
-<template name="navbar">
-  <nav class="navbar navbar-default navbar-fixed-top">
+<template name="navbarX">
+  <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
         <a class="navbar-brand" href="/">
@@ -30,6 +30,43 @@
       <div class="pull-right">
         {{> loginButtons align="right"}}
       </div>
+    </div>
+  </nav>
+</template>
+
+<template name="navbar">
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/">
+          <img class="pull-left" id="logo" alt="Logo" src="favicon-194x194.png">
+          <span class="navbar-brand">Site Ace</span>
+        </a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+
+        <ul class="nav navbar-nav">
+          <li><a href="/search">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            Search</a>
+          </li>
+          <li><a href="#">Recommendations</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li>{{> loginButtons align="right"}}</li>
+        </ul>
+
+      </div>
+
     </div>
   </nav>
 </template>
@@ -154,6 +191,50 @@
   </div>
 </template>
 
+<!-- Templates for search -->
+
+<template name="searchPage">
+  <div class="container">
+    <ol class="breadcrumb">
+      <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+        Home</a>
+      </li>
+      <li class="active">Search</li>
+    </ol>
+    <h3>Search Websites</h3>
+    <div class="row">
+      <div class="col-xs-12">
+        <form class="js-search-form">
+          <div class="form-group">
+
+            <div class="input-group">
+              <input type="text" class="form-control" id="search" required
+                placeholder="Enter something to search for&hellip;">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-default btn-primary js-search">
+                  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                  Search
+                </button>
+              </span>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="searchResults">
+  <div class="container">
+    <ol class="list-group">
+      {{#each websites}}
+        {{>websiteItem}}
+      {{/each}}
+    </ol>
+  </div>
+</template>
+
 <!-- Templates for site details, comments, and comment form -->
 
 <template name="siteDetailsPage">
@@ -234,4 +315,21 @@
         </div>
       </div>
     {{/each}}
+</template>
+
+<template name="footer">
+  <nav class="navbar navbar-default navbar-fixed-bottom">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <p class="navbar-text">
+          Final assignment for the
+          <a href="https://www.coursera.org/learn/meteor-development/home/welcome">
+          Coursera 'Introduction to Meteor.js Development'
+          </a> course.
+          Source code on
+          <a href="https://github.com/smathx/meteor" class="navbar-link">GitHub</a>.
+        </p>
+      </div>
+    </div>
+  </nav>
 </template>

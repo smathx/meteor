@@ -5,9 +5,6 @@ Router.configure({
 });
 
 Router.route('/', function () {
-  this.render('navbar', {
-    to:'navbar'
-  });
   this.render('websitesPage', {
     to:'main'
   });
@@ -16,11 +13,16 @@ Router.route('/', function () {
   });
 });
 
-Router.route('/sites/:_id', function () {
-  this.render('navbar', {
-    to:'navbar'
+Router.route('/search', function () {
+  this.render('searchPage', {
+    to:'main'
   });
+  this.render('searchResults', {
+    to:'list'
+  });
+});
 
+Router.route('/sites/:_id', function () {
   this.render('siteDetailsPage', {
     to:'main',
     data:function(){

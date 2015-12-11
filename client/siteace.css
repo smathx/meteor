@@ -1,31 +1,51 @@
-/* Compensate for fixed navbar at top of page */
+/* Compensate for fixed navbar at top and bottom of page */
+
 body {
-    padding-top: 70px;
+  padding-top: 70px;
+  padding-bottom: 60px;
 }
 
 /* Hide website and comment forms */
+
 .hidden_div {
-    display: none;
+  display: none;
 }
 
-/* Attempt to make default 'Sign in' link less ugly */
+/* Attempt (failed) to make default 'Sign in' link less ugly */
 
 .login-link-text {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 18px;
-    padding: 15px 15px;
-    line-height: 20px;
-    float: left;
-    background-color: transparent;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  padding: 15px 15px;
+  line-height: 20px;
+  float: left;
+  color: #9d9d9d;
+  background-color: transparent;
+  text-decoration: none;                /* TODO: doesn't work */
+
 }
 
-.accounts-dialog a {
-    text-decoration: none;    /* TODO: doesn't work */
-    /*
-    color: #337ab7;
-    cursor: auto;
-    color: #777;
-    height: 50px;
-    margin-left: -15px;
-  */
+/* Same thing in menu */
+
+.in .login-link-text {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  padding: 10px 15px 10px 15px;
+  line-height: 20px;
+  float: left;
+  color: #9d9d9d;
+  background-color: transparent;
+  text-decoration: none;                /* TODO: doesn't work */
+}
+
+.login-link-text a:hover {
+  color: #ffffff;                       /* TODO: doesn't work */
+}
+
+/* navbar logo - trial and error */
+
+#logo {
+  padding-top: 10px;
+  padding-right: 10px;
+  height: 45px;
 }

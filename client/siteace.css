@@ -1,7 +1,14 @@
-/* CSS declarations go here */
-.hidden_div{
-	display:none;
+/* Compensate for fixed navbar at top of page */
+body {
+    padding-top: 70px;
 }
+
+/* Hide website and comment forms */
+.hidden_div {
+    display: none;
+}
+
+/* Attempt to make default 'Sign in' link less ugly */
 
 .login-link-text {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -10,16 +17,15 @@
     line-height: 20px;
     float: left;
     background-color: transparent;
-}    
-    
-.accounts-dialog a {
+}
 
-    text-decoration: none;
-/*      
+.accounts-dialog a {
+    text-decoration: none;    /* TODO: doesn't work */
+    /*
     color: #337ab7;
     cursor: auto;
     color: #777;
     height: 50px;
     margin-left: -15px;
-  */  
+  */
 }

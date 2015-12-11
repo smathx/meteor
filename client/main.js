@@ -29,8 +29,8 @@ Template.websitesPage.helpers({
 //----------------------------------------------------------------------------
 
 Template.websiteForm.events({
-	'click .js-get-site-data':function (event) {
-	  var url = getUrl($('#url').val());
+	'click .js-get-site-data': function (event) {
+	  var url = Meteor.common.getUrl($('#url').val());
 	  console.log('get-site-data: ' + url);
 
     $('#title').val('');
@@ -47,7 +47,7 @@ Template.websiteForm.events({
     }
 	},
 
-	'submit .js-save-website-form':function (event) {
+	'submit .js-save-website-form': function (event) {
 
 		Websites.insert({
 			title: event.target.title.value,
@@ -60,16 +60,27 @@ Template.websiteForm.events({
 		});
 		toggleWebsiteForm();
 		return false;
+	},
+
+  // TODO: Only works if an input field has focus.
+	'keyup .js-save-website-form': function (event) {
+	  if (event.keyCode == 27) {
+	    toggleWebsiteForm();
+	    return false;
+	  }
 	}
 });
 
 Template.websiteForm.onRendered(function () {
-  $('[data-toggle="tooltip"]').tooltip();
-
+  // Clean up URL field on exit.
   $('#url').focusout(function (event) {
-    $('#url').val(getUrl(event.target.value));
+    $('#url').val(Meteor.common.getUrl(event.target.value));
   });
+  // Needed for Bootstrap tooltips to work.
+  $('[data-toggle="tooltip"]').tooltip();
 });
+
+// Toggle form and clear it on completion.
 
 function toggleWebsiteForm() {
 	$('#websiteForm').toggle('fast', function () {
@@ -77,23 +88,10 @@ function toggleWebsiteForm() {
 	});
 }
 
-function getUrl(url) {
-  if (url) {
-    url = url.replace(/^\s*(http(s?):[\\/]*)?\s*(.*)\b\s*$/i,'http$2://$3');
-
-    if (url.search(/^https?:\/\/$/) != -1)
-      url = '';
-
-    else if (url.indexOf('.') == -1)
-      url += '.com';
-  }
-  return url;
-}
-
 //----------------------------------------------------------------------------
 
 Template.websiteList.helpers({
-	websites:function () {
+	websites: function () {
 		return Websites.find({}, { sort: { upVotes: -1, downVotes: 1 }});
 	}
 });
@@ -101,19 +99,22 @@ Template.websiteList.helpers({
 //----------------------------------------------------------------------------
 
 Template.websiteItem.events({
-	'click .js-upvote':function (event) {
-		var website_id = this._id;
-
-		Websites.update({_id:website_id}, { $inc: { upVotes: 1}});
+	'click .js-upvote': function (event) {
+	  if (Meteor.user)
+      Websites.update({_id: this._id}, { $inc: { upVotes: 1}});
 		return false;
 	},
 
-	'click .js-downvote':function (event) {
-		var website_id = this._id;
-
-		Websites.update({_id:website_id}, { $inc: { downVotes: 1}});
+	'click .js-downvote': function (event) {
+	  if (Meteor.user)
+  		Websites.update({_id:this._id}, { $inc: { downVotes: 1}});
 		return false;
 	}
+});
+
+Template.websiteItem.onRendered(function () {
+  // Needed for Bootstrap tooltips to work.
+  $('[data-toggle="tooltip"]').tooltip();
 });
 
 //----------------------------------------------------------------------------
@@ -191,7 +192,11 @@ Template.registerHelper('formatDate', function (datetime) {
   if (!locale)
     return datetime.toLocaleDateString();
 
-  var options = { day: 'numeric', month: 'long', year: 'numeric' };
+  var options = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  };
   return datetime.toLocaleDateString(locale, options);
 });
 

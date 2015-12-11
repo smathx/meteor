@@ -19,11 +19,15 @@ function matchAny(str, regexList) {
   regexList.some(function (r) {
     return found = str.match(r);
   });
-  return found ? _.unescape(found[1]): found;
+  return found ? _.unescape(found[1]): '';
 }
 
 function getSiteData(url) {
-  var data = { error: 'GET failed on ' + url };
+  var data = {
+    title: '',
+    description: '',
+    error: 'GET failed on ' + url
+  };
 
   console.log('getSiteData: ' + url);
 
@@ -48,13 +52,13 @@ function getSiteData(url) {
 
       if (!data.title) {
         console.log(url + ' no title found');
-        console.log(result.content.match(/(.{1,20}\btitle\b.{1,20})/img));
+        console.log('  '+result.content.match(/(.{1,20}\btitle\b.{1,20})/img));
       }
 
       if (!data.description) {
         console.log(url + ' no description found');
         result.content.match(/<meta[^>]*>/ig).forEach(function (meta) {
-          console.log(meta);
+          console.log('  ' + meta);
         });
       }
     }
@@ -168,20 +172,25 @@ Meteor.startup(function () {
     // Takes too long too load if there are too many sites to look up.
 
     var sites = [
-      'Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda', 'ABC', 'CBS', 'BA',
-      'Amazon', 'Ford', 'BP', 'Chevron', 'Walmart', 'Verizon', 'Virgin',
-      'Yahoo'
+      'Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda', 'ABC', 'CBS',
+      'Amazon', 'Ford', 'BA', 'Yahoo', 'Verizon', 'Virgin',
+
+      'Chevron',    // title split over multiple lines
+      'BP',         // no site description
+      'edX.org',    // .com is another site
+      'Coursera',   // .com redirects to .org
+      'Walmart'     // can't read page at all
     ];
 
     sites.forEach(function (name) {
 
-      var url = 'http://www.' + name.toLowerCase() + '.com';
+      var url = Meteor.common.getUrl(name);
       var data = getSiteData(url);
 
       Websites.insert({
-        title: name + ': ' + data.title,
+        title: data.title ? data.title: url,
         url: url,
-        description: data.description ? data.description: 'No description found.',
+        description: data.description ? data.description: 'No description given.',
         upVotes: randomNumber(10),
         downVotes: randomNumber(5),
         ownerId: randomUserId(),

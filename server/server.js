@@ -1,7 +1,7 @@
 // TODO: Split the startup code into a separate file. The random stuff could
 // be split off as a separate modules as it is likely to be useful again.
 
-/* global Websites:true, Comments:true */
+/* global Websites:true, Comments:true, Keywords */
 /* global _ */
 
 Meteor.methods({
@@ -25,6 +25,10 @@ Meteor.publish('Websites', function () {
 
 Meteor.publish('Comments', function () {
   return Comments.find();
+});
+
+Meteor.publish('Keywords', function () {
+  return Keywords.find();
 });
 
 Meteor.publish('Users', function () {
@@ -217,20 +221,42 @@ Meteor.startup(function () {
       'Walmart'     // can't read page at all
     ];
 
+    // TODO: Put this into a method
+
     sites.forEach(function (name) {
 
       var url = Meteor.common.getUrl(name);
       var data = getSiteData(url);
 
-      Websites.insert({
+      var id = Websites.insert({
         title: data.title ? data.title: url,
         url: url,
         description: data.description ? data.description: 'No description given.',
         upVotes: randomNumber(10),
         downVotes: randomNumber(5),
+        keywords: Meteor.common.getKeywords(data.title) +
+                  Meteor.common.getKeywords(data.description),
         ownerId: randomUserId(),
         createdAt: randomDate()
       });
+
+      if (data.title) {
+        Meteor.common.getKeywords(data.title).forEach(function (word) {
+          Keywords.insert({
+            word: word,
+            siteId: id
+          });
+        });
+      }
+
+      if (data.description) {
+        Meteor.common.getKeywords(data.description).forEach(function (word) {
+          Keywords.insert({
+            word: word,
+            siteId: id
+          });
+        });
+      }
     });
   }
 

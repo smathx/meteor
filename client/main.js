@@ -5,6 +5,7 @@
 
 Meteor.subscribe('Websites');
 Meteor.subscribe('Comments');
+Meteor.subscribe('Keywords');
 Meteor.subscribe('Users');
 
 //----------------------------------------------------------------------------
@@ -54,14 +55,22 @@ Template.websiteForm.events({
     }
 	},
 
+  // TODO: This code is a duplicated in server.js
+  // TODO: Don't allow same URL to be entered twice.
+
 	'submit .js-save-website-form': function (event) {
+    var url = event.target.url.value;
+    var title = event.target.title.value;
+    var description = event.target.description.value;
 
 		Websites.insert({
-			title: event.target.title.value,
-			url: event.target.url.value,
-			description: event.target.description.value,
+			title: title,
+			url: url,
+			description: description,
 			upVotes: 0,
 			downVotes: 0,
+      keywords: Meteor.common.getKeywords(title) +
+                Meteor.common.getKeywords(description),
 			ownerId: Meteor.userId(),
 			createdAt: new Date()
 		});
@@ -224,10 +233,16 @@ Template.searchResults.helpers({
 });
 
 //----------------------------------------------------------------------------
+// TODO: getRecommendedSites is being called multiple times to
+// render the template.
 
 Template.recommendPage.helpers({
 	recommendCountMsg: function () {
-    var count = Session.get('recommendResults').length;
+    var sites = getRecommendedSites();
+    var count;
+
+    if (sites)
+      count = sites.length;
 
     if (!count || (count == 0))
       return 'Sorry, there are no recommended websites.';
@@ -237,28 +252,54 @@ Template.recommendPage.helpers({
 
     return count + ' recommended websites found.';
 	},
+
 	sitesFound: function () {
-	  return Session.get('recommendResults');
+	  return getRecommendedSites();
 	}
 });
 
-Template.recommendPage.onRendered(function () {
+function getRecommendedSites() {
   var results = [];
 
   if (Meteor.user()) {
-    var id = Meteor.userId();
-    var sites = Comments.find({ ownerId: id }).map(function (x) {
-      return x.siteId;
+
+    // Get the IDs of the sites the user commented on.
+
+    var interesting_sites = Comments
+      .find({ ownerId: Meteor.userId() })
+      .map(function (x) {
+        return x.siteId;
+      }
+    );
+
+    // Concatenate the titles of interested sites into a string.
+
+    var words = '';
+    interesting_sites.forEach(function (siteId) {
+      words += ' ' + Websites.findOne({ _id: siteId }).title;
     });
-    console.log(sites);
-    results = sites.map(function (siteId) {
-      return Websites.findOne({ _id: siteId });
-    });
+
+    // Build list of keywords by splitting the string into words,
+    // sorting, removing duplicates, and filtering out short words.
+
+    var keywords = words
+      .toLowerCase()
+      .split(/[^a-z]+/g)
+      .sort()
+      .filter(function(word, index, array){
+        return (word !== array[index-1]) && (word.length > 3);
+      });
+
+    console.log(keywords);
+
+    // Find all sites including a keyword in the title.
+
+    results = Websites.find()
+
     console.log(results);
   }
-
-  Session.set('recommendResults', results);
-})
+  return results;
+}
 
 //----------------------------------------------------------------------------
 

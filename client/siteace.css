@@ -42,7 +42,7 @@ body {
   color: #ffffff;                       /* TODO: doesn't work */
 }
 
-/* navbar logo - trial and error */
+/* navbar logo - trial and error. Changes when menu drops down */
 
 #logo {
   padding-top: 10px;

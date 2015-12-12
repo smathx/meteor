@@ -1,6 +1,13 @@
 /* global Comments:true, Websites:true */
 
 //----------------------------------------------------------------------------
+// TODO: Check this is correct. Too simple?
+
+Meteor.subscribe('Websites');
+Meteor.subscribe('Comments');
+Meteor.subscribe('Users');
+
+//----------------------------------------------------------------------------
 
 Accounts.ui.config({
   passwordSignupFields: 'USERNAME_AND_EMAIL'
@@ -17,12 +24,12 @@ Template.websitesPage.helpers({
     var count = Websites.find().count();
 
     if (count == 0)
-      return 'There are no recommended websites.';
+      return 'There are no website reviews.';
 
     if (count == 1)
-      return 'There is 1 recommended website.';
+      return 'There is 1 website review.';
 
-    return 'There are ' + count + ' recommended websites.';
+    return 'There are ' + count + ' website reviews.';
 	}
 });
 
@@ -100,13 +107,13 @@ Template.websiteList.helpers({
 
 Template.websiteItem.events({
 	'click .js-upvote': function (event) {
-	  if (Meteor.user)
+	  if (Meteor.user())
       Websites.update({_id: this._id}, { $inc: { upVotes: 1}});
 		return false;
 	},
 
 	'click .js-downvote': function (event) {
-	  if (Meteor.user)
+	  if (Meteor.user())
   		Websites.update({_id:this._id}, { $inc: { downVotes: 1}});
 		return false;
 	}
@@ -120,7 +127,7 @@ Template.websiteItem.onRendered(function () {
 //----------------------------------------------------------------------------
 
 Template.commentSection.events({
-	'click .toggle-comment-form': function (event) {
+	'click .js-toggle-comment-form': function (event) {
     $('#commentForm').toggle('fast');
 	}
 });
@@ -142,7 +149,7 @@ Template.commentSection.helpers({
 //----------------------------------------------------------------------------
 
 Template.commentForm.events({
-	'submit .save-comment-form': function (event) {
+	'submit .js-save-comment-form': function (event) {
     if (Meteor.user()) {
   		Comments.insert({
   			text: event.target.comment.value,
@@ -157,7 +164,7 @@ Template.commentForm.events({
     event.target.comment.value = '';
 		return false;
 	},
-	'reset .toggle-comment-form': function (event) {
+	'reset .js-toggle-comment-form': function (event) {
     $('#commentForm').toggle('fast');
     event.target.comment.value = '';
     return false;
@@ -216,9 +223,27 @@ Template.searchResults.helpers({
 	}
 });
 
-//Template.searchPage.onRendered(function () {
-//  $('.js-search-form input').addClass('form-control');
-//});
+//----------------------------------------------------------------------------
+
+Template.recommendPage.helpers({
+	recommendCountMsg: function () {
+    var count = 123;
+
+    if (!count || (count == 0))
+      return 'Sorry, there are no recommended websites.';
+
+    if (count == 1)
+      return '1 recommended website found.';
+
+    return count + ' recommended websites found.';
+	}
+});
+
+Template.recommendResult.helpers({
+	sitesFound: function () {
+	  return null;
+	}
+});
 
 //----------------------------------------------------------------------------
 

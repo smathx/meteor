@@ -19,52 +19,43 @@
   {{> footer }}
 </template>
 
-<template name="navbarX">
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="/">
-          Site Ace
-        </a>
-      </div>
-      <div class="pull-right">
-        {{> loginButtons align="right"}}
-      </div>
-    </div>
-  </nav>
-</template>
-
 <template name="navbar">
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
 
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+          data-target="#site-navbar">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
         <a href="/">
-          <img class="pull-left" id="logo" alt="Logo" src="favicon-194x194.png">
+          <img class="pull-left" id="logo" alt="Logo" src="/favicon-194x194.png">
           <span class="navbar-brand">Site Ace</span>
         </a>
       </div>
 
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
-
+      <div class="collapse navbar-collapse" id="site-navbar">
         <ul class="nav navbar-nav">
           <li><a href="/search">
             <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
             Search</a>
           </li>
-          <li><a href="#">Recommendations</a></li>
+          <li><a href="/recommend">
+            <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+            Recommendations</a>
+          </li>
+          <li><a href="/about">
+            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+            About</a>
+          </li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
           <li>{{> loginButtons align="right"}}</li>
         </ul>
-
       </div>
 
     </div>
@@ -81,7 +72,7 @@
           Home
       </li>
     </ol>
-    <h3>Recommended Websites</h3>
+    <h3>Website Reviews</h3>
     {{#if currentUser }}
       <div class="row">
         <div class="col-sm-9">
@@ -90,7 +81,7 @@
         <div class="col-sm-3">
           <button type="button"
             class="btn btn-primary btn-sm pull-right js-toggle-website-form">
-            Recommend new website…
+            Add a new website&hellip;
           </button>
         </div>
       </div>
@@ -131,7 +122,7 @@
 
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea class="form-control" rows="3" id="description" required placeholder="I found this site really useful for…"></textarea>
+            <textarea class="form-control" rows="3" id="description" required placeholder="I found this site really useful for&hellip;"></textarea>
           </div>
 
           <button type="button" class="btn btn-default btn-sm js-toggle-website-form">Cancel</button>
@@ -292,8 +283,8 @@
       </div>
       <div class="col-xs-3">
         <button type="button"
-                class="btn btn-primary btn-sm pull-right toggle-comment-form">
-          Add new comment…
+                class="btn btn-primary btn-sm pull-right js-toggle-comment-form">
+          Add new comment&hellip;
         </button>
       </div>
     </div>
@@ -307,14 +298,14 @@
 
 <template name="commentForm">
     <div id="commentForm" class="hidden_div">
-      <form class="save-comment-form">
+      <form class="js-save-comment-form">
         <div class="form-group">
           <label for="comment">Comment:</label>
           <textarea class="form-control" rows="3" id="comment" required
-                    placeholder="Enter your comment here…"></textarea>
+                    placeholder="Enter your comment here&hellip;"></textarea>
         </div>
         <button type="reset"
-                class="btn btn-default btn-sm toggle-comment-form">Cancel</button>
+                class="btn btn-default btn-sm js-toggle-comment-form">Cancel</button>
         <button type="submit" class="btn btn-primary btn-sm">Save</button>
       </form>
     </div>
@@ -335,6 +326,73 @@
     {{/each}}
 </template>
 
+<!-- Templates for recommendation -->
+
+<template name="recommendPage">
+  <div class="container">
+
+    <ol class="breadcrumb">
+      <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+        Home</a>
+      </li>
+      <li class="active">Recommend</li>
+    </ol>
+
+    <h3>Recommended Sites</h3>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <img src="/work-in-progress.png">
+        <p>{{ recommendCountMsg }}</p>
+        <ol class="list-group">
+          {{#each sitesFound }}
+            {{>recommendResult}}
+          {{/each}}
+        </ol>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<template name="recommendResult">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-xs-12 col-sm-10">
+        <a href="{{url}}">{{title}}</a>
+      </div>
+      <div class="col-xs-4 col-xs-offset-8 col-sm-2 col-sm-offset-0 text-center">
+        <a href="sites/{{_id}}">More&hellip;</a>
+      </div>
+    </div>
+  </li>
+</template>
+
+<!-- Templates for info page -->
+
+<template name="aboutPage">
+  <div class="container">
+
+    <ol class="breadcrumb">
+      <li><a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+        Home</a>
+      </li>
+      <li class="active">About</li>
+    </ol>
+
+    <h3>About This Site&hellip;</h3>
+
+    <div class="row">
+      <div class="col-xs-12">
+        Where to begin &hellip;
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<!-- Templates for footer notes -->
+
 <template name="footer">
   <nav class="navbar navbar-default navbar-fixed-bottom">
     <div class="container-fluid">
@@ -342,10 +400,8 @@
         <p class="navbar-text">
           Final assignment for the
           <a href="https://www.coursera.org/learn/meteor-development/home/welcome"
-            class="navbar-link">
-          Coursera 'Introduction to Meteor.js Development'
-          </a> course.
-          Source code on
+            class="navbar-link">Coursera 'Introduction to Meteor.js Development'</a>
+            course. Source code on
           <a href="https://github.com/smathx/meteor" class="navbar-link">GitHub</a>.
         </p>
       </div>

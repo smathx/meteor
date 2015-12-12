@@ -227,7 +227,7 @@ Template.searchResults.helpers({
 
 Template.recommendPage.helpers({
 	recommendCountMsg: function () {
-    var count = 123;
+    var count = Session.get('recommendResults').length;
 
     if (!count || (count == 0))
       return 'Sorry, there are no recommended websites.';
@@ -236,14 +236,29 @@ Template.recommendPage.helpers({
       return '1 recommended website found.';
 
     return count + ' recommended websites found.';
+	},
+	sitesFound: function () {
+	  return Session.get('recommendResults');
 	}
 });
 
-Template.recommendResult.helpers({
-	sitesFound: function () {
-	  return null;
-	}
-});
+Template.recommendPage.onRendered(function () {
+  var results = [];
+
+  if (Meteor.user()) {
+    var id = Meteor.userId();
+    var sites = Comments.find({ ownerId: id }).map(function (x) {
+      return x.siteId;
+    });
+    console.log(sites);
+    results = sites.map(function (siteId) {
+      return Websites.findOne({ _id: siteId });
+    });
+    console.log(results);
+  }
+
+  Session.set('recommendResults', results);
+})
 
 //----------------------------------------------------------------------------
 

@@ -207,8 +207,8 @@ Meteor.startup(function () {
     // Takes too long too load if there are too many sites to look up.
 
     var sites = [
-      //'Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda', 'ABC', 'CBS',
-      //'Amazon', 'Ford', 'BA', 'Yahoo', 'Verizon', 'Virgin',
+      'Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda', 'ABC', 'CBS',
+      'Amazon', 'Ford', 'BA', 'Yahoo', 'Verizon', 'Virgin',
 
       'Chevron',    // title split over multiple lines
       'BP',         // no site description

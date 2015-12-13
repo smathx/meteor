@@ -167,10 +167,12 @@
               {{downVotes}}
             </a>
           </div>
-          <div class="col-xs-2 col-xs-offset-8 col-sm-1 col-sm-offset-0 text-center"
+          <div class="col-xs-2 col-xs-offset-8 col-sm-1 col-sm-offset-0 text-center">
+            <a href="sites/{{_id}}" class="btn btn-default btn-xs btn-info"
               data-toggle="tooltip" data-placement="bottom"
-              title="More details and comments">
-            <a href="sites/{{_id}}">More&hellip;</a>
+              title="Details">
+              <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+            </a>
           </div>
         </div>
         <p>
@@ -387,14 +389,79 @@
       <li class="active">About</li>
     </ol>
 
-    <h3>About This Site&hellip;</h3>
-
     <div class="row">
       <div class="col-xs-12">
-        <img src="/work-in-progress.png">
+        <h3>About This Site&hellip;</h3>
+
         <p>
-          Where to begin&hellip;
+          This site was written for the final assignment of the excellent
+          <a href="https://www.coursera.org">Coursera</a>
+          <a href="https://www.coursera.org/learn/meteor-development/home/welcome">
+          Introduction to Meteor.js Development</a> course.
         </p>
+        <p>
+          The general idea is to present a list of websites recommended by users
+          and allow them to comment and vote on them. Users can also search the
+          sites and get recommendations based on their comments and votes.
+        </p>
+
+        <h3>The Code</h3>
+        <p>
+          The code is on
+          <a href="https://github.com/smathx/meteor" class="navbar-link">GitHub</a>.
+          It has a lot of rough edges - there is very little error
+          checking, recommendations are probably only good for a small number
+          of sites, and I'm still not sure about how code should be divided
+          between the client and server. It is what it is!
+        </p>
+
+        <h3>Test Data</h3>
+        <p>
+          There are 41 sites already present, 76 users, and a couple of hundred
+          comments. All the users have the same password '123456'.
+        </p>
+
+        <h3>Acknowledgments</h3>
+        <ul>
+          <li>
+            <a href="http://getbootstrap.com">Bootstrap</a>
+            &mdash; Responsive web framework.
+          </li>
+          <li>
+            <a href="https://bootswatch.com">Bootswatch</a>
+            &mdash; Code snippets.
+          </li>
+          <li>
+            <a href="https://c9.io">Cloud9 IDE</a>
+            &mdash; An online IDE which was used to write everything. As a
+            Windows Vista user I was not able to get Meteor to run and would
+            never have gotten anywhere without this site.
+          </li>
+          <li>
+            <a href="https://atmospherejs.com/easy/search">easy:search</a>
+            &mdash; A Meteor search component that really is easy to use.
+          </li>
+          <li>
+            <a href="http://glyphicons.com">Glyphicons</a>
+            &mdash; Button and menu icons.
+          </li>
+          <li>
+            <a href="https://google.com">Google</a>
+            &mdash; The font of all internet wisdom &hellip; and quite a lot of junk.
+          </li>
+          <li>
+            <a href="https://www.meteor.com">Meteor</a>
+            &mdash; JavaScript framework and DB interface. Very nice tutorial.
+          </li>
+          <li>
+            <a href="https://www.mongodb.org">MongoDB</a>
+            &mdash; Database back end.
+          </li>
+          <li>
+            <a href="https://stackoverflow.com">Stack Overflow</a>
+            &mdash; If they ever charge for access I'm going broke &hellip;
+          </li>
+        </ul>
       </div>
     </div>
 

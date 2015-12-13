@@ -240,7 +240,7 @@ Template.recommendPage.helpers({
 
     if (!count || (count == 0)) {
       if (sites == null)
-        return 'You need to comment on a website before we can recommend any.'
+        return 'You need to comment or vote on a website before we can recommend any.'
       else
         return 'Sorry, there are no recommended websites.';
     }

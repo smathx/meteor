@@ -269,7 +269,7 @@ Meteor.startup(function () {
       Accounts.createUser({
         username: name,
         email: name.toLowerCase() + '@fake.mail',
-        password: '......'
+        password: '123456'
       });
     });
   }

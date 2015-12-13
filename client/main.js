@@ -62,7 +62,7 @@ Template.websiteForm.events({
     var url = event.target.url.value;
     var title = event.target.title.value;
     var description = event.target.description.value;
-
+/*
 		Websites.insert({
 			title: title,
 			url: url,
@@ -74,6 +74,9 @@ Template.websiteForm.events({
 			ownerId: Meteor.userId(),
 			createdAt: new Date()
 		});
+*/
+    Meteor.call('addWebsite', url, title, description, Meteor.userId());
+
 		toggleWebsiteForm();
 		return false;
 	},
@@ -246,8 +249,12 @@ Template.recommendPage.helpers({
     if (sites)
       count = sites.count();
 
-    if (!count || (count == 0))
-      return 'Sorry, there are no recommended websites.';
+    if (!count || (count == 0)) {
+      if (sites == null)
+        return 'You need to comment on a website before we can recommend any.'
+      else
+        return 'Sorry, there are no recommended websites.';
+    }
 
     if (count == 1)
       return '1 recommended website found.';
@@ -261,7 +268,8 @@ Template.recommendPage.helpers({
 });
 
 /* global Keywords */
-// Note: This function returns a Meteor cursor, not an Array.
+// This function returns a Meteor cursor, not an Array. Undefined means no-one
+// is signed in, null means the user has no keywords.
 function getRecommendedSites() {
   var results;
 
@@ -277,42 +285,43 @@ function getRecommendedSites() {
       }
     );
 
-    // Put all keywords from each site into an array - include duplicates.
+    // Put all keywords from each site into an array, skip duplicates.
 
     var keywords = [];
 
     interesting_sites.forEach(function (siteId) {
       Websites.findOne({ _id: siteId }).keywords
         .forEach(function (word) {
-          keywords.push(word);
+          if (keywords.indexOf(word) == -1)
+            keywords.push(word);
         });
     });
 
     console.log('Keywords:', keywords);
 
-    // Build a list of all site IDs including any keyword, sort it, and
-    // strip duplicate IDs.
+    if (keywords.length == 0)
+      results = null;
+    else {
+      // Build a list of all site IDs including any keyword, sort it, and
+      // strip duplicate IDs.
 
-    var recommended_sites = Keywords
-      .find({word: {$in: keywords }})
-      .fetch()
-      .map(function (keyword) {
-        return keyword.siteId;
-      })
-      .sort()
-      .filter(function (siteId, index, array) {
-        return array.indexOf(siteId) == index;
-      });
+      var recommended_sites = Keywords
+        .find({word: {$in: keywords }})
+        .fetch()
+        .map(function (keyword) {
+          return keyword.siteId;
+        })
+        .sort()
+        .filter(function (siteId, index, array) {
+          return array.indexOf(siteId) == index;
+        });
 
-    // Return a list of sites as Meteor cursor.
+      // Return a list of sites as Meteor cursor.
 
-    results = Websites.find({ _id: { $in: recommended_sites }});
+      results = Websites.find({ _id: { $in: recommended_sites }});
+    }
   }
   return results;
-}
-
-function uniqueWords(set, words) {
-
 }
 
 //----------------------------------------------------------------------------

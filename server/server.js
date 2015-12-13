@@ -14,6 +14,11 @@ Meteor.methods({
   },
   'search': function (text) {
     return search(text);
+  },
+  'addWebsite': function (url, title, description, ownerId,
+                          date, upVotes, downVotes, keywords) {
+    return addWebsite(url, title, description, ownerId,
+                      date, upVotes, downVotes, keywords);
   }
 });
 
@@ -92,6 +97,41 @@ function getSiteData(url) {
     console.log('getSiteData: ' + data.error);
 
   return data;
+}
+
+function addWebsite(url, title, description, ownerId,
+                    date, upVotes, downVotes, keywords) {
+  var primary_keywords =
+    Meteor.common.getKeywords(title + (keywords? ' ' + keywords: ''));
+
+  var id = Websites.insert({
+    title: title ? title: url,
+    url: url,
+    description: description ? description: 'No description given.',
+    upVotes: upVotes ? upVotes: 0,
+    downVotes: downVotes ? downVotes: 0,
+    keywords: primary_keywords,
+    ownerId: ownerId,
+    createdAt: date ? date: new Date()
+  });
+
+  if (title) {
+    primary_keywords.forEach(function (word) {
+      Keywords.insert({
+        word: word,
+        siteId: id
+      });
+    });
+  }
+
+  if (description) {
+    Meteor.common.getKeywords(description).forEach(function (word) {
+      Keywords.insert({
+        word: word,
+        siteId: id
+      });
+    });
+  }
 }
 
 /* global WebsitesIndex */
@@ -191,8 +231,8 @@ Meteor.startup(function () {
       'Joe', 'Jon', 'Joy', 'Kai', 'Kay', 'Ken', 'Kim', 'Lee', 'Len', 'Leo',
       'Les', 'Lou', 'Lyn', 'Mae', 'Max', 'May', 'Meg', 'Mel', 'Mia', 'Ned',
       'Pam', 'Pip', 'Rab', 'Raj', 'Ray', 'Rex', 'Rob', 'Rod', 'Ron', 'Roy',
-      'Sal', 'Sam', 'Sia', 'Sid', 'Sue', 'Tam', 'Tea', 'Tom', 'Uri', 'Val',
-      'Vin', 'Wes', 'Wyn', 'Zak', 'Zoe'
+      'Sal', 'Sam', 'Sia', 'Sid', 'Sue', 'Tam', 'Tea', 'Tim', 'Tom', 'Uri',
+      'Val', 'Vin', 'Wes', 'Wyn', 'Zak', 'Zoe'
     ];
 
     names.forEach(function (name) {
@@ -212,18 +252,68 @@ Meteor.startup(function () {
     // Takes too long too load if there are too many sites to look up.
 
     var sites = [
-      'Google', 'Apple', 'Intel', 'IBM', 'CNN', 'Honda', 'ABC', 'CBS',
-      'Amazon', 'Ford', 'BA', 'Yahoo', 'Verizon', 'Virgin',
+      'Apple',
+      'Facebook',   // update your browser ??
+      'Google',
+      'LinkedIn',
+      'Twitter',
+      'Yahoo',
 
-      'Chevron',    // title split over multiple lines
+      'AMD',
+      'ARM',
+      'Intel',
+      'ti',         // Texas Instruments
+
+      'dell.co.uk', // .com returns no content
+      'IBM',
+      'HP',
+      'Lenovo',     // access denied
+
+      'ABC',
+      'CBS',
+      'CNN',
+      'Fox',
+      'NBC',
+
+      'Ford',       // title has unescaped entity
+      'Honda',
+      'Porsche',
+      'Toyota',
+      'VW',
+
+      'Amazon',
+      'Costco',
+      'Tesco',
+      'Target',
+      'Walmart',    // access denied
+
+      'AA',
+      'BA',
+      'Delta',      // access denied
+      'Lufthansa',
+      'Southwest',
+      'Virgin',
+
       'BP',         // no site description
-      'edX.org',    // .com is another site
+      'Chevron',    // title split over multiple lines
+      'Exxon',
+      'Texaco',
+
       'Coursera',   // .com redirects to .org
-      'Walmart'     // can't read page at all
+      'edX.org'     // .com is another site
+  //  'NASA.gov'    // error: ECONNRESET
     ];
 
-    // TODO: Put this into a method
+    sites.forEach(function (name) {
+      var url = Meteor.common.getUrl(name);
+      var data = getSiteData(url);
 
+      addWebsite(url, data.title, data.description, randomUserId(),
+        randomDate(), randomNumber(10), randomNumber(5), name);
+    });
+  }
+
+/*
     sites.forEach(function (name) {
 
       var url = Meteor.common.getUrl(name);
@@ -260,7 +350,7 @@ Meteor.startup(function () {
       }
     });
   }
-
+*/
   // Dummy comments
 
   if (!Comments.findOne()) {

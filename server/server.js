@@ -123,6 +123,7 @@ Meteor.startup(function () {
     Meteor.users.remove({});
     Websites.remove({});
     Comments.remove({});
+    Keywords.remove({});
   }
 
   // Some helper functions for random data.
@@ -227,6 +228,7 @@ Meteor.startup(function () {
 
       var url = Meteor.common.getUrl(name);
       var data = getSiteData(url);
+      var primary_keywords = Meteor.common.getKeywords(data.title + ' ' + name);
 
       var id = Websites.insert({
         title: data.title ? data.title: url,
@@ -234,14 +236,13 @@ Meteor.startup(function () {
         description: data.description ? data.description: 'No description given.',
         upVotes: randomNumber(10),
         downVotes: randomNumber(5),
-        keywords: Meteor.common.getKeywords(data.title) +
-                  Meteor.common.getKeywords(data.description),
+        keywords: primary_keywords,
         ownerId: randomUserId(),
         createdAt: randomDate()
       });
 
       if (data.title) {
-        Meteor.common.getKeywords(data.title).forEach(function (word) {
+        primary_keywords.forEach(function (word) {
           Keywords.insert({
             word: word,
             siteId: id

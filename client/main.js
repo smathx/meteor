@@ -233,8 +233,10 @@ Template.searchResults.helpers({
 });
 
 //----------------------------------------------------------------------------
-// TODO: getRecommendedSites is being called multiple times to
-// render the template.
+// TODO: getRecommendedSites is being called multiple times to render the
+// template. When testing this throws up a lot of unknown site IDs which
+// can only be fixed by a reset. There is probably a smart database way
+// to do this.
 
 Template.recommendPage.helpers({
 	recommendCountMsg: function () {
@@ -242,7 +244,7 @@ Template.recommendPage.helpers({
     var count;
 
     if (sites)
-      count = sites.length;
+      count = sites.count();
 
     if (!count || (count == 0))
       return 'Sorry, there are no recommended websites.';
@@ -258,47 +260,59 @@ Template.recommendPage.helpers({
 	}
 });
 
+/* global Keywords */
+// Note: This function returns a Meteor cursor, not an Array.
 function getRecommendedSites() {
-  var results = [];
+  var results;
 
   if (Meteor.user()) {
 
-    // Get the IDs of the sites the user commented on.
+    // TODO: Build these as the user comments/votes are added.
+    // Get the IDs of all the sites the user commented on.
 
     var interesting_sites = Comments
       .find({ ownerId: Meteor.userId() })
-      .map(function (x) {
-        return x.siteId;
+      .map(function (comment) {
+        return comment.siteId;
       }
     );
 
-    // Concatenate the titles of interested sites into a string.
+    // Put all keywords from each site into an array - include duplicates.
 
-    var words = '';
+    var keywords = [];
+
     interesting_sites.forEach(function (siteId) {
-      words += ' ' + Websites.findOne({ _id: siteId }).title;
+      Websites.findOne({ _id: siteId }).keywords
+        .forEach(function (word) {
+          keywords.push(word);
+        });
     });
 
-    // Build list of keywords by splitting the string into words,
-    // sorting, removing duplicates, and filtering out short words.
+    console.log('Keywords:', keywords);
 
-    var keywords = words
-      .toLowerCase()
-      .split(/[^a-z]+/g)
+    // Build a list of all site IDs including any keyword, sort it, and
+    // strip duplicate IDs.
+
+    var recommended_sites = Keywords
+      .find({word: {$in: keywords }})
+      .fetch()
+      .map(function (keyword) {
+        return keyword.siteId;
+      })
       .sort()
-      .filter(function(word, index, array){
-        return (word !== array[index-1]) && (word.length > 3);
+      .filter(function (siteId, index, array) {
+        return array.indexOf(siteId) == index;
       });
 
-    console.log(keywords);
+    // Return a list of sites as Meteor cursor.
 
-    // Find all sites including a keyword in the title.
-
-    results = Websites.find()
-
-    console.log(results);
+    results = Websites.find({ _id: { $in: recommended_sites }});
   }
   return results;
+}
+
+function uniqueWords(set, words) {
+
 }
 
 //----------------------------------------------------------------------------

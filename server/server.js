@@ -1,7 +1,7 @@
 // TODO: Split the startup code into a separate file. The random stuff could
 // be split off as a separate modules as it is likely to be useful again.
 
-/* global Websites:true, Comments:true, Keywords */
+/* global Websites, Comments, Keywords, Votes */
 /* global _ */
 
 Meteor.methods({
@@ -19,6 +19,9 @@ Meteor.methods({
                           date, upVotes, downVotes, keywords) {
     return addWebsite(url, title, description, ownerId,
                       date, upVotes, downVotes, keywords);
+  },
+  'addVote': function (userId, siteId, vote) {
+    return addVote(userId, siteId, vote);
   }
 });
 
@@ -40,6 +43,10 @@ Meteor.publish('Users', function () {
   return Meteor.users.find();
 });
 
+Meteor.publish('Votes', function () {
+  return Votes.find();
+});
+
 // Checks a string against a list of regex's returning with the first
 // matching group, unescaped.
 
@@ -50,6 +57,8 @@ function matchAny(str, regexList) {
   });
   return found ? _.unescape(found[1]): '';
 }
+
+// Attempt to read title and description from page header.
 
 function getSiteData(url) {
   var data = {
@@ -99,6 +108,9 @@ function getSiteData(url) {
   return data;
 }
 
+// Add a website. date, upVotes, downVotes, and keywords default to current
+// Date(), zero and nothing, resp.
+
 function addWebsite(url, title, description, ownerId,
                     date, upVotes, downVotes, keywords) {
   var primary_keywords =
@@ -134,6 +146,23 @@ function addWebsite(url, title, description, ownerId,
   }
 }
 
+// Add a vote.
+
+function addVote(userId, siteId, vote) {
+  if (userId && siteId && vote) {
+    Votes.insert({
+      userId: userId,
+      siteId: siteId,
+      vote: vote
+    });
+
+    if (vote > 0)
+      Websites.update({ _id: siteId }, { $inc: { upVotes: 1 }});
+    else
+      Websites.update({ _id: siteId }, { $inc: { downVotes: 1 }});
+  }
+}
+
 /* global WebsitesIndex */
 // The search is done on the server as it seems erratic on the client,
 // returning no match, then several a couple of seconds later.
@@ -164,6 +193,7 @@ Meteor.startup(function () {
     Websites.remove({});
     Comments.remove({});
     Keywords.remove({});
+    Votes.remove({});
   }
 
   // Some helper functions for random data.
@@ -313,44 +343,6 @@ Meteor.startup(function () {
     });
   }
 
-/*
-    sites.forEach(function (name) {
-
-      var url = Meteor.common.getUrl(name);
-      var data = getSiteData(url);
-      var primary_keywords = Meteor.common.getKeywords(data.title + ' ' + name);
-
-      var id = Websites.insert({
-        title: data.title ? data.title: url,
-        url: url,
-        description: data.description ? data.description: 'No description given.',
-        upVotes: randomNumber(10),
-        downVotes: randomNumber(5),
-        keywords: primary_keywords,
-        ownerId: randomUserId(),
-        createdAt: randomDate()
-      });
-
-      if (data.title) {
-        primary_keywords.forEach(function (word) {
-          Keywords.insert({
-            word: word,
-            siteId: id
-          });
-        });
-      }
-
-      if (data.description) {
-        Meteor.common.getKeywords(data.description).forEach(function (word) {
-          Keywords.insert({
-            word: word,
-            siteId: id
-          });
-        });
-      }
-    });
-  }
-*/
   // Dummy comments
 
   if (!Comments.findOne()) {

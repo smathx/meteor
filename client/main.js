@@ -1,4 +1,4 @@
-/* global Comments:true, Websites:true */
+/* global Comments, Websites, Votes */
 
 //----------------------------------------------------------------------------
 // TODO: Check this is correct. Too simple?
@@ -7,6 +7,7 @@ Meteor.subscribe('Websites');
 Meteor.subscribe('Comments');
 Meteor.subscribe('Keywords');
 Meteor.subscribe('Users');
+Meteor.subscribe('Votes');
 
 //----------------------------------------------------------------------------
 
@@ -55,26 +56,13 @@ Template.websiteForm.events({
     }
 	},
 
-  // TODO: This code is a duplicated in server.js
   // TODO: Don't allow same URL to be entered twice.
 
 	'submit .js-save-website-form': function (event) {
     var url = event.target.url.value;
     var title = event.target.title.value;
     var description = event.target.description.value;
-/*
-		Websites.insert({
-			title: title,
-			url: url,
-			description: description,
-			upVotes: 0,
-			downVotes: 0,
-      keywords: Meteor.common.getKeywords(title) +
-                Meteor.common.getKeywords(description),
-			ownerId: Meteor.userId(),
-			createdAt: new Date()
-		});
-*/
+
     Meteor.call('addWebsite', url, title, description, Meteor.userId());
 
 		toggleWebsiteForm();
@@ -116,17 +104,18 @@ Template.websiteList.helpers({
 });
 
 //----------------------------------------------------------------------------
+// TODO: Allow only one vote per user per site ?
 
 Template.websiteItem.events({
 	'click .js-upvote': function (event) {
 	  if (Meteor.user())
-      Websites.update({_id: this._id}, { $inc: { upVotes: 1}});
+      Meteor.call('addVote', Meteor.userId(), this._id, 1);
 		return false;
 	},
 
 	'click .js-downvote': function (event) {
 	  if (Meteor.user())
-  		Websites.update({_id:this._id}, { $inc: { downVotes: 1}});
+      Meteor.call('addVote', Meteor.userId(), this._id, -1);
 		return false;
 	}
 });
@@ -276,12 +265,22 @@ function getRecommendedSites() {
   if (Meteor.user()) {
 
     // TODO: Build these as the user comments/votes are added.
-    // Get the IDs of all the sites the user commented on.
+    // Get the IDs of all the sites the user commented or voted on.
 
-    var interesting_sites = Comments
+    var sites = [];
+
+    Comments
       .find({ ownerId: Meteor.userId() })
-      .map(function (comment) {
-        return comment.siteId;
+      .forEach(function (comment) {
+        if (sites.indexOf(comment.siteId) == -1)
+          sites.push(comment.siteId);
+      }
+    );
+
+    Votes.find({ userId: Meteor.userId(), vote: 1 })
+      .forEach(function (vote) {
+        if (sites.indexOf(vote.siteId) == -1)
+          sites.push(vote.siteId);
       }
     );
 
@@ -289,7 +288,7 @@ function getRecommendedSites() {
 
     var keywords = [];
 
-    interesting_sites.forEach(function (siteId) {
+    sites.forEach(function (siteId) {
       Websites.findOne({ _id: siteId }).keywords
         .forEach(function (word) {
           if (keywords.indexOf(word) == -1)
